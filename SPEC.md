@@ -1,197 +1,106 @@
 # thor-cms
 
-Admin panel components for content-driven sites. You copy the source into your project with the shadcn CLI, then wire it to whatever backend you already have.
+Reader: the agent that builds this repo, and the agent that later copies it into a website.
 
-## What this is
+## Problem Statement
 
-A set of React components for building the screen a non-technical person uses to edit a website: reorder the sections, switch one off, swap a photo, upload a video, manage a list of links, watch the numbers.
+A site owner who is not a developer wants to change the words, pictures, videos and links on their own website, reorder its sections, switch one off, and see how many people came. Today that panel exists once, inside one site, tied to that site's database, file host and framework. Every new site means writing the panel again.
 
-The components are extracted from a working portfolio site's admin panel. They are already used daily by someone who is not a developer, which is where the design decisions came from.
+## Solution
 
-## What this is not
+One working admin panel in this repo, running on fake data. An agent copies it into any website, writes a short list of that site's editable fields, and writes the small pieces that talk to that site's storage. The panel draws itself from the field list. It never knows what framework the site uses or where the content is kept.
 
-- Not a backend. No database, no file storage, no API routes, no auth.
-- Not a hosted service.
-- Not an npm dependency. The source lands in your repo and you own it.
+## User Stories
 
-## Distribution
+1. As a site owner, I want to see every section of my site as a list, so that I know what is on the page.
+2. As a site owner, I want to drag a section up or down, so that the page shows it in the order I choose.
+3. As a site owner, I want to switch a section off, so that it leaves the site without being deleted.
+4. As a site owner, I want some sections fixed in place, like the top bar and the footer, so that I cannot break the page by moving them.
+5. As a site owner, I want to click a section and see its boxes, so that I can change the words in it.
+6. As a site owner, I want a one-line box for short words and a bigger box for paragraphs, so that each fits what I type.
+7. As a site owner, I want to drop a picture on a picture box, so that I can swap a photo without a file dialog.
+8. As a site owner, I want the picture box to tell me in one plain sentence why it refused a file, so that I can pick a better one.
+9. As a site owner, I want to drag a picture inside its box to choose which part is kept, so that faces are not cut off.
+10. As a site owner, I want the picture to be shrunk in my browser before it goes up, so that a phone photo does not take minutes.
+11. As a site owner, I want a progress bar while a picture or video goes up, so that I know something is happening.
+12. As a site owner, I want to pick a video file and have it checked for type, size and shape, so that the site only gets videos it can play.
+13. As a site owner, I want a list of items with a thumbnail, a name and a tag, so that I can manage products, team members or examples.
+14. As a site owner, I want to drag items to reorder them, so that the best one comes first.
+15. As a site owner, I want folders for items, with rename, reorder and delete, so that items are grouped the way the page shows them.
+16. As a site owner, I want to move an item from one folder to another, so that I do not re-upload it.
+17. As a site owner, I want a list of my social accounts with the platform's own icon, so that I see at a glance which is which.
+18. As a site owner, I want the link box to tell me when a link is not a link, so that the site never has a dead one.
+19. As a site owner, I want a bar at the bottom that appears when something is unsaved, with Save and Cancel, so that I never lose a change by accident.
+20. As a site owner, I want to be asked before removing anything, so that one slip does not delete my work.
+21. As a site owner, I want a live preview of the site beside the boxes, so that I see the change before I save.
+22. As a site owner, I want the preview to jump to the thing I am editing, so that I do not scroll to find it.
+23. As a site owner, I want the preview at phone size and at laptop size, so that I check both.
+24. As a site owner, I want to know when my saved change is on the live site, so that I do not refresh and wonder.
+25. As a site owner, I want a numbers page with visits, plays, countries and what people pressed, so that I know how the site does.
+26. As a site owner, I want to choose 7, 30 or 90 days on the numbers page, so that I compare periods.
+27. As a site owner, I want a "Fields" page where I can add, rename, retype or remove a field, so that a field the agent got wrong does not need the agent again.
+28. As a site owner, I want every button with only an icon to say what it does when I rest on it, so that I never guess.
+29. As a site owner, I want green for "put on the site", red for "take off", grey for everything else, so that colour tells me what a button does.
+30. As a site owner, I want the panel to work on my phone, so that I can fix a typo from anywhere.
+31. As an agent wiring a site, I want one `AGENTS.md` that says what to copy and what to write, so that I finish without reading the whole panel.
+32. As an agent wiring a site, I want the panel to run here on fake data with `npm run dev`, so that I see every piece working before I touch it.
+33. As an agent wiring a site, I want a single field list file that drives the whole panel, so that I describe the site once.
+34. As an agent wiring a site, I want field types for short text, long text, picture, row of pictures, video, list of items, list of links, and a custom slot, so that any site fits.
+35. As an agent wiring a site, I want a picture rule per field (types, shape, smallest size), so that the panel refuses bad files before they go anywhere.
+36. As an agent wiring a site, I want one place to put the code that loads and saves content, so that git repo, database or anything else is my choice.
+37. As an agent wiring a site, I want one place to put the code that stores pictures and videos, so that repo, Bunny, R2 or anything else is my choice.
+38. As an agent wiring a site, I want one place to put the code that fetches the numbers, so that any analytics source works.
+39. As an agent wiring a site, I want one place to put the code that tells the preview which site to show and how to send it live changes, so that any framework works.
+40. As an agent wiring a site, I want the panel to build to plain static files, so that I drop them into any site's output at `/admin`.
+41. As an agent wiring a site, I want the custom field slot to receive value, onChange and disabled, so that a field the list cannot describe still fits.
+42. As an agent wiring a site, I want the field list to be editable from inside the panel and saved through the same content code, so that the owner's fixes persist.
+43. As an agent building this repo, I want every exported type named and documented, so that hovering a name explains it.
+44. As an agent building this repo, I want tests on the pure helpers and on the pieces with real behaviour, so that a change that breaks dragging or refusing a file fails loudly.
+45. As an agent building this repo, I want no file to mention the site the code came from, so that nothing leaks.
 
-A shadcn registry. Someone installs one piece at a time:
+## Implementation Decisions
 
-```
-npx shadcn@latest add https://thor-cms.pages.dev/r/item-list.json
-```
+- The repo is one Vite + React application. `npm install && npm run dev` runs it on fake data. `npm run build` produces static files that serve from `/admin` on any host.
+- No install command, no component registry, no hosted site. An agent clones this repo and copies the application folder into the target site.
+- `AGENTS.md` at the repo root tells the wiring agent what to copy, what to write, and what the site must provide. It names as requirements, per site: the content code, the files code, the numbers code, the preview code, login, and picture and video size limits. None of those ship here beyond the fake versions.
+- One field list file drives the panel. It lists sections in page order. Each section has an id, a label, flags for fixed and locked, and fields. Each field has a key, a label and a type. Types in v1: short text, long text, picture, row of pictures, video, list of items, list of links, custom. A picture field carries a rule: accepted types, shape, smallest size. A custom field carries a render function receiving value, onChange and disabled.
+- The panel reads the field list at start and draws the left menu, the editor pane and the save bar from it. No section or field is hard-coded.
+- The "Fields" page edits the field list. It supports add, rename, change type, reorder and remove. Changes save through the content code like any other content.
+- Four slots, each a small typed interface the agent fills per site. Shipped versions are in-memory fakes:
+  - content: load the whole content, save the whole content, say when the saved version is live.
+  - files: take a picture or video blob, report progress, return a URL.
+  - numbers: given a day count, return visits by day, plays, countries, sources, taps, stays.
+  - preview: the URL to frame, and a way to push the current unsaved content and the field being edited into that frame.
+- Every component is controlled. It takes data as props and reports change through callbacks. It never fetches, writes or uploads. Upload is a callback the component receives.
+- Picture rules, shrinking and cropping run in the browser before the files code is called.
+- Video upload stays video-specific: pick, check type, size and shape, then hand the file to the files code, which may be resumable.
+- The numbers page takes section labels, platform labels and icons from the field list and the links field, never from constants.
+- Names follow the general case: Item not Reel, Collection not Group, MediaField not PictureCard, LinkList not AccountList, AnalyticsBoard not VisitorsBoard, Panel not SiteEditor.
+- Styling: Tailwind v4 and shadcn pieces inside the panel app only. The host site's CSS is untouched because the panel is its own page.
+- TypeScript strict. No `any`. No default exports. Every exported prop type named and exported. Plain English comments that say why, in the voice the source uses.
+- Source is copied from the existing panel and generalised. The source does not change. Drift between the two is accepted.
 
-The registry is served from a Cloudflare Pages site built out of this repo, so the install URL never changes. Each registry item declares its own dependencies (`@dnd-kit/*`, `lucide-react`, the shadcn primitives it needs) and the CLI pulls those in.
+## Testing Decisions
 
-Consumers need Tailwind v4 and shadcn already set up. That is stated in the README as the only prerequisite.
+- A good test drives the panel the way the owner does and checks what appears on screen. It never reads component state or calls internals.
+- Test points, highest first:
+  1. The whole panel mounted with a field list and the fake slots. Tests: sections render from the list, dragging reorders, switching off marks a section, editing a box enables the save bar, Save calls the content code with the new content, Cancel restores, the "Fields" page adds a field and the editor shows it.
+  2. Each slot interface tested through the panel with a fake that records calls. Tests: files code receives the shrunk blob and progress reaches the bar, a refused file never reaches the files code, the numbers page draws what the numbers code returns.
+  3. Pure helpers with unit tests: picture rules, cropping and shrinking maths, item ordering and moving between folders, link checking, joining visits and plays by day.
+- Tools: vitest, @testing-library/react, jsdom. Same as the source repo.
+- Prior art: the source repo's suite. Tests of generic logic move across. Tests that assert site-specific words do not.
 
-## Repo layout
+## Out of Scope
 
-```
-registry/
-  thor/
-    item-list/          one folder per registry item
-    collection-list/
-    section-list/
-    media-field/
-    video-upload/
-    link-list/
-    panel-shell/
-    analytics-board/
-    ...
-  lib/                  shared helpers, also registry items
-apps/
-  demo/                 Next.js app, every component wired to fake data
-apps/
-  docs/                 the Cloudflare Pages site that serves /r/*.json
-registry.json           the index the CLI reads
-```
+- Real content, files, numbers or preview code for any site. Each site's agent writes those.
+- Login and token handling. Named as a requirement in `AGENTS.md`.
+- Any database, file host, or backend code.
+- Picture and video size limits for a given site. The agent sets the rules per field.
+- An install command or a component registry.
+- Translation of the panel's own words. Strings are constants the agent edits.
+- Wiring into Virtusolar. Separate task after this repo is done.
 
-`apps/demo` and `apps/docs` may be the same Next.js app. Decide during build; one app is simpler and the demo is the best documentation anyway.
+## Further Notes
 
-## The two layers
-
-### Layer 1: components
-
-Every component is controlled. It takes its data as props and reports changes through callbacks. It never fetches, never writes, never uploads.
-
-That rule has one consequence worth stating plainly: `PictureCard` today calls the upload endpoint itself and `MetaEditor`/`SiteEditor` fetch their own data. Both must be turned inside out before they ship. The upload becomes `onPick(file) => Promise<string>` supplied by the consumer, so the component shows progress and errors without knowing where bytes go.
-
-### Layer 2: the configured panel
-
-`<ThorPanel>` takes a config describing the sections and the fields in each one, and renders the whole left menu, drag ordering, on/off switches, editor pane and save bar.
-
-```ts
-const sections: SectionConfig[] = [
-  { id: 'header', label: 'Header', fixed: true, locked: true },
-  {
-    id: 'hero',
-    label: 'Photo and name',
-    fields: [
-      { type: 'text', key: 'tagline', label: 'Small line above the name' },
-      { type: 'text', key: 'name', label: 'Name, big' },
-      { type: 'longText', key: 'intro', label: 'Intro paragraph' },
-      { type: 'media', key: 'photo', label: 'Your photo', rule: PORTRAIT },
-    ],
-  },
-  {
-    id: 'work',
-    label: 'Examples',
-    fields: [{ type: 'collection', key: 'examples', itemLabel: 'Example' }],
-  },
-  {
-    id: 'contact',
-    label: 'Get in touch',
-    fields: [
-      { type: 'text', key: 'email', label: 'Email address', validate: isEmail },
-      { type: 'links', key: 'accounts', label: 'Social accounts' },
-      { type: 'custom', key: 'hours', render: (p) => <OpeningHours {...p} /> },
-    ],
-  },
-]
-```
-
-Field types in v1: `text`, `longText`, `media`, `mediaRow`, `collection`, `links`, `custom`. `custom` receives `{ value, onChange, disabled }` and returns anything, so the config can never trap someone.
-
-`<ThorPanel>` is itself built out of Layer 1 pieces and has no privileged access. Anyone who outgrows it drops to the components and composes by hand.
-
-## Components in v1
-
-### Editing
-
-| Name | What it does |
-|---|---|
-| `SectionList` | The bands of a page: drag to reorder, switch on and off, click to open. Some rows fixed in place. |
-| `ItemList` | A sortable list of things with a thumbnail, a name, a tag and a folder. Generalised from a list of videos, so it handles products, team members, case studies. |
-| `CollectionList` | Folders the items sit in: rename, reorder, delete, with the item count on each. |
-| `MediaField` | One picture: shows what is there, lets someone pick a new one, refuses the wrong type or size with a specific message, turns red when it refuses, uploads through a callback with a progress bar. |
-| `VideoUpload` | Picks a video file, checks it, hands it to a resumable upload the consumer supplies. Video-specific by design. |
-| `LinkList` | A list of accounts: platform, handle, URL, with the URL checked and the platform's own icon in its own colour. |
-| `SaveBar` | The strip along the bottom that appears when something is unsaved. |
-| `IconButton` | A square icon button with a tooltip, in a neutral, green or destructive tone. |
-| `Thumb` | A small square preview that falls back to an icon when there is no picture. |
-| `BrandIcon` | Social platform marks from `simple-icons`, each in its own brand colour, falling back to text colour where the mark is black. |
-
-### Shell
-
-| Name | What it does |
-|---|---|
-| `PanelShell` | Left menu of pages, two-column layout, the header. |
-| `PreviewPane` | An iframe pointed at any URL, told which item to highlight, with a check for whether the live site has caught up with the last save. |
-
-### Analytics
-
-| Name | What it does |
-|---|---|
-| `AnalyticsBoard` | The whole numbers page, fed plain arrays as props. |
-| `VisitsBars`, `VisitsAgainstPlays` | Recharts charts over `{ date, visits, plays }`. |
-| `CountryFlag` | A country name in, its flag out. |
-
-The analytics pieces must lose every hardcoded reference to the original site's sections and platforms. Labels and icons come in as props.
-
-### Helpers
-
-| Name | What it does |
-|---|---|
-| `picture-rules` | Describes what a slot accepts (types, shape, minimum size) and produces one plain sentence saying what is wrong with a rejected file. Ships with square, wide, portrait and 9:16-or-16:9 rules, plus a way to write your own. |
-| `shrink-picture` | Resizes a picture in the browser before upload. |
-| `item-order` | Reordering and moving items between folders. |
-| `use-panel-query` | A thin TanStack Query wrapper with the read/save/invalidate pattern. Optional; every component works without it. |
-
-## Naming
-
-Names come from the general case, not the site this was pulled out of.
-
-| Was | Becomes |
-|---|---|
-| `Reel` | `Item` |
-| `Group` | `Collection` |
-| `PictureCard` | `MediaField` |
-| `AccountList` | `LinkList` |
-| `VisitorsBoard` | `AnalyticsBoard` |
-| "the Editor" (a person) | "the editor" (whoever uses the panel) |
-| `SiteEditor` | `ThorPanel` |
-
-`VideoUpload` keeps its name. Resumable video upload is genuinely video-specific and pretending otherwise would be a worse name.
-
-## The demo app
-
-`apps/demo` is a Next.js app holding a fake site and its panel. Every component appears, wired to in-memory data: fake uploads that resolve after a delay, fake analytics numbers, a preview iframe pointing at the fake site.
-
-It is how the work gets reviewed, and it is the example in the README. It runs with `npm run dev` and needs no keys, no database and no network.
-
-## Code style
-
-- TypeScript, strict. Every exported prop type named and exported.
-- JSDoc on every export, so hovering the name in an editor explains it.
-- Plain English comments inside, explaining why a decision was made, in the voice the original code uses. No comments restating what the line does.
-- Components take `className` and merge it, so the look is the consumer's.
-- No `any`. No default exports.
-
-## Testing
-
-`vitest` for the pure helpers: picture rules, ordering, link checking, the analytics maths. `@testing-library/react` for the pieces with real behaviour: drag ordering, refusing a wrong file, clearing an error when the user navigates away.
-
-The source these components come from has a passing suite already. The tests covering generic logic move across; the ones asserting site-specific copy do not.
-
-## Out of scope for v1
-
-- Any backend, database or storage adapter.
-- Auth or user management.
-- A CLI that generates a project.
-- i18n. Strings are props or constants a consumer edits.
-
-## Extraction, not refactor
-
-thor-cms copies source and generalises it. It carries no dependency on where the code came from, and nothing there changes.
-
-The cost is drift: the two copies diverge from the day this is published. That is the trade for shipping without touching running code.
-
-## Done means
-
-1. `npx shadcn@latest add` from the public URL puts a working component into a fresh Next.js + Tailwind v4 + shadcn project.
-2. The demo app runs from a clean clone with `npm install && npm run dev`, and every component on this list is reachable and usable in it.
-3. `ThorPanel` renders a panel from a config with no site-specific code.
-4. No file in the repo mentions the site it was extracted from.
-5. README shows the install command and a config that produces a working panel.
+- The shape copies how Payload CMS, Directus and Strapi stay storage-agnostic: a field config draws the admin, and swappable pieces talk to storage. Framework independence copies Decap and Sveltia: the admin is its own static page at `/admin`.
+- The source panel is used daily by a non-developer. Its wording, colours and refusal messages were shaped by that use and move across unchanged where they are not site-specific.
