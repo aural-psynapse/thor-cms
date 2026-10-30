@@ -37,5 +37,9 @@ export const sampleContent: Content = {
         { id: 'youtube', platform: 'youtube', text: 'Northside', url: 'https://youtube.com/@northside' },
       ],
     },
+    search: {
+      title: 'Northside Ceramics, handmade cups and bowls',
+      description: 'Stoneware and porcelain thrown, glazed and fired in a small studio by the river.',
+    },
   },
 }

@@ -16,7 +16,7 @@ export const slots: Slots = {
   // The fake numbers name the demo's own sections, links and videos, so a
   // change to the field list or the sample shows up on the Numbers page.
   numbers: fakeNumbers({
-    sections: sampleContent.sections.filter((s) => !s.fixed).map((s) => s.id),
+    sections: sampleContent.sections.filter((s) => !s.fixed && s.page !== 'settings').map((s) => s.id),
     links: allLinks(sampleContent).map((l) => l.id),
     videos: sampleContent.sections.flatMap((s) =>
       s.fields.filter((f) => f.type === 'video').map((f) => f.label),

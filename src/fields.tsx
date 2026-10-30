@@ -67,4 +67,14 @@ export const fieldList: FieldList = [
     ],
   },
   { id: 'footer', label: 'Footer', fixed: true, locked: true, fields: [] },
+  {
+    // Not a band of the page, so it sits on the Settings page.
+    id: 'search',
+    label: 'In search results',
+    page: 'settings',
+    fields: [
+      { key: 'title', label: 'Title in the browser tab', type: 'text' },
+      { key: 'description', label: 'Line under the title in search results', type: 'longText' },
+    ],
+  },
 ]

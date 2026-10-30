@@ -35,6 +35,37 @@ describe('the panel drawn from a field list', () => {
     expect(numbers.load).not.toHaveBeenCalled()
   })
 
+  it('moves settings sections out of the edit list onto the Settings page', async () => {
+    const { slots, content } = recordingSlots({
+      sections: [],
+      values: { seo: { title: 'Old title' } },
+    })
+    const user = await mountPanel(slots, [
+      ...testFields,
+      {
+        id: 'seo',
+        label: 'Search results',
+        page: 'settings',
+        fields: [{ key: 'title', label: 'Tab title', type: 'text' }],
+      },
+    ])
+    expect(screen.queryByText('Search results')).toBeNull()
+    await user.click(screen.getByRole('button', { name: 'Settings' }))
+    const box = screen.getByLabelText('Tab title') as HTMLInputElement
+    expect(box.value).toBe('Old title')
+    await user.clear(box)
+    await user.type(box, 'New title')
+    await user.click(screen.getByRole('button', { name: 'Save' }))
+    await waitFor(() => expect(content.save).toHaveBeenCalled())
+    expect(lastSaved(content).values.seo?.title).toBe('New title')
+  })
+
+  it('leaves the Settings page out when no section belongs there', async () => {
+    const { slots } = recordingSlots()
+    await mountPanel(slots)
+    expect(screen.queryByRole('button', { name: 'Settings' })).toBeNull()
+  })
+
   it('opens the first page it shows when the edit page is left out', async () => {
     const { slots } = recordingSlots()
     render(<Panel fields={testFields} slots={slots} pages={['fields']} />)

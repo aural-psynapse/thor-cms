@@ -100,7 +100,9 @@ Every word the panel itself shows sits in `src/panel/words.ts`. To put the panel
 
 ## 6c. Pick the pages the owner sees
 
-`<Panel pages={['edit']} />` shows only the edit page. Leave out `'fields'` when the site's design draws a fixed set of boxes: a box added there would never show on the site. Leave out `'numbers'` when the site counts nothing. All three show by default.
+`<Panel pages={['edit']} />` shows only the edit page. Leave out `'fields'` when the site's design draws a fixed set of boxes: a box added there would never show on the site. Leave out `'numbers'` when the site counts nothing. Edit, Numbers and Fields show by default.
+
+A section that is not a band of the page, such as the search engine title, contact details or a form's words, gets `page: 'settings'` in the field list. It leaves the Edit list and shows on a Settings page with its boxes open and no preview. The Settings page shows by default whenever such a section exists.
 
 ## 7. Build and copy
 
