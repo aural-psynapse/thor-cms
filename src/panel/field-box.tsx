@@ -1,7 +1,9 @@
 import { Card } from '@/components/ui/card'
 import { Label } from '@/components/ui/label'
 import type { CustomRender, JsonValue, StoredField } from './field-list'
-import { readText } from './lib/values'
+import { readPictures, readText } from './lib/values'
+import { MediaField } from './media-field'
+import { PictureRow } from './picture-row'
 import type { FilesSlot } from './slots'
 import { TextFieldBox } from './text-field'
 
@@ -36,6 +38,30 @@ export function FieldBox({ field, value, onChange, onLook, tools }: FieldBoxProp
           long={field.type === 'longText'}
           value={readText(value)}
           onChange={onChange}
+          onLook={onLook}
+          disabled={tools.disabled}
+        />
+      )
+    case 'picture':
+      return (
+        <MediaField
+          label={field.label}
+          rule={field.rule}
+          url={readText(value)}
+          onChange={onChange}
+          upload={tools.upload}
+          onLook={onLook}
+          disabled={tools.disabled}
+        />
+      )
+    case 'pictures':
+      return (
+        <PictureRow
+          label={field.label}
+          rule={field.rule}
+          urls={readPictures(value)}
+          onChange={onChange}
+          upload={tools.upload}
           onLook={onLook}
           disabled={tools.disabled}
         />

@@ -6,7 +6,7 @@ import { emptyNumbers } from '@/panel/lib/numbers'
 import { SQUARE, WIDE } from '@/panel/lib/picture-rules'
 import { VIDEO } from '@/panel/lib/video-check'
 import { Panel } from '@/panel/panel'
-import type { Slots } from '@/panel/slots'
+import type { Slots, UploadOptions } from '@/panel/slots'
 
 /** A small site with one of every kind of box. */
 export const testFields: FieldList = [
@@ -52,7 +52,7 @@ export function recordingSlots(start: Content | null = null) {
     isLive: vi.fn(async () => true),
   }
   const files = {
-    upload: vi.fn(async (_file: Blob, options: { onProgress: (n: number) => void }) => {
+    upload: vi.fn(async (_file: Blob, options: UploadOptions): Promise<string> => {
       options.onProgress(0.5)
       return 'https://files.example/picture.webp'
     }),
