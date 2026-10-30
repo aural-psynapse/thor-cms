@@ -4,6 +4,7 @@ import type { CustomRender, JsonValue, StoredField } from './field-list'
 import { readPictures, readText } from './lib/values'
 import { MediaField } from './media-field'
 import { PictureRow } from './picture-row'
+import { VideoField } from './video-field'
 import type { FilesSlot } from './slots'
 import { TextFieldBox } from './text-field'
 
@@ -15,6 +16,10 @@ export type FieldTools = {
   upload: FilesSlot['upload']
   /** Custom renders from the code field list, by key. */
   renders: Map<string, CustomRender>
+  /** Videos picked and not yet sent, by the address the preview plays them from. */
+  pendingVideos: Map<string, File>
+  /** Keeps a picked video until Save, and gives the address to play it from now. */
+  holdVideo: (file: File) => string
 }
 
 /** One box drawn from its field, with its value. */
@@ -66,6 +71,21 @@ export function FieldBox({ field, value, onChange, onLook, tools }: FieldBoxProp
           disabled={tools.disabled}
         />
       )
+    case 'video': {
+      const url = readText(value)
+      const picked = tools.pendingVideos.get(url)
+      return (
+        <VideoField
+          label={field.label}
+          rule={field.rule}
+          has={url !== '' && !picked}
+          pickedName={picked?.name}
+          onPick={(file) => onChange(tools.holdVideo(file))}
+          onLook={onLook}
+          disabled={tools.disabled}
+        />
+      )
+    }
     case 'custom': {
       const render = tools.renders.get(field.key)
       return (

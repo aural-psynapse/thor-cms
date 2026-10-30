@@ -8,6 +8,8 @@ import {
   type FieldList,
   type JsonValue,
 } from './field-list'
+import type { FieldTools } from './field-box'
+import { sameContent, videosWaiting, withValue } from './lib/content'
 import { waitForLive, type WaitParts } from './lib/wait-for-live'
 import { SaveBar, type SaveStage } from './save-bar'
 import { SectionEditor } from './section-editor'
@@ -26,10 +28,6 @@ export type PanelProps = {
   liveCheck?: LiveCheck
 }
 
-function same(a: Content | null, b: Content | null): boolean {
-  return JSON.stringify(a) === JSON.stringify(b)
-}
-
 /**
  * The admin panel. It loads the content once, keeps the owner's changes in a
  * draft beside what was last saved, and only calls the content code when she
@@ -41,6 +39,7 @@ export function Panel({ fields, slots, title = 'Your site', liveCheck }: PanelPr
   const [loadProblem, setLoadProblem] = useState<string | null>(null)
   const [open, setOpen] = useState<string | null>(null)
   const [stage, setStage] = useState<SaveStage>({ name: 'resting' })
+  const [pending, setPending] = useState<Map<string, File>>(() => new Map())
   const renders = useMemo(() => rendersOf(fields), [fields])
 
   useEffect(() => {
@@ -72,7 +71,7 @@ export function Panel({ fields, slots, title = 'Your site', liveCheck }: PanelPr
     )
   }
 
-  const dirty = !same(draft, saved)
+  const dirty = !sameContent(draft, saved)
   const busy = stage.name === 'sending' || stage.name === 'saving'
   const section = draft.sections.find((s) => s.id === open) ?? null
 
@@ -84,14 +83,52 @@ export function Panel({ fields, slots, title = 'Your site', liveCheck }: PanelPr
   }
 
   function setValue(sectionId: string, key: string, value: JsonValue) {
-    if (!draft) return
-    const inside = draft.values[sectionId] ?? {}
-    change({ ...draft, values: { ...draft.values, [sectionId]: { ...inside, [key]: value } } })
+    if (draft) change(withValue(draft, sectionId, key, value))
+  }
+
+  // A picked video stays on her computer until Save. The preview plays it
+  // from this address in the meantime.
+  function holdVideo(file: File): string {
+    const url = URL.createObjectURL(file)
+    setPending((held) => new Map(held).set(url, file))
+    return url
+  }
+
+  // Sends every picked video to the files code, one after another, and puts
+  // each one's real address in place of the address on her computer.
+  async function sendVideos(content: Content): Promise<Content> {
+    const waiting = videosWaiting(content, pending)
+    if (waiting.length === 0) return content
+    const done = waiting.map(() => 0)
+    const sum = () => done.reduce((a, b) => a + b, 0) / waiting.length
+    setStage({ name: 'sending', done: 0 })
+    let next = content
+    for (const [at, video] of waiting.entries()) {
+      const address = await slots.files.upload(video.file, {
+        name: video.file.name,
+        kind: 'video',
+        onProgress: (part) => {
+          done[at] = part
+          setStage({ name: 'sending', done: sum() })
+        },
+      })
+      next = withValue(next, video.section, video.key, address)
+    }
+    return next
   }
 
   async function save() {
     if (!draft) return
-    const sending = draft
+    let sending: Content
+    try {
+      sending = await sendVideos(draft)
+    } catch (error) {
+      setStage({
+        name: 'stuck',
+        problem: `Nothing was saved: the video did not go up. ${String(error)}`,
+      })
+      return
+    }
     setStage({ name: 'saving' })
     let version: number
     try {
@@ -101,6 +138,8 @@ export function Panel({ fields, slots, title = 'Your site', liveCheck }: PanelPr
       return
     }
     setSaved(sending)
+    setDraft(sending)
+    setPending(new Map())
     setStage({ name: 'waiting' })
     const live = await waitForLive({
       isLive: () => slots.content.isLive(version),
@@ -119,10 +158,17 @@ export function Panel({ fields, slots, title = 'Your site', liveCheck }: PanelPr
 
   function cancel() {
     setDraft(saved)
+    setPending(new Map())
     setStage({ name: 'resting' })
   }
 
-  const tools = { disabled: busy, upload: slots.files.upload, renders }
+  const tools: FieldTools = {
+    disabled: busy,
+    upload: slots.files.upload,
+    renders,
+    pendingVideos: pending,
+    holdVideo,
+  }
 
   return (
     <TooltipProvider>
