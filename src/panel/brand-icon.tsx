@@ -13,9 +13,24 @@ import {
   type SimpleIcon,
 } from 'simple-icons'
 
+type Mark = Pick<SimpleIcon, 'path' | 'hex'> & { evenOdd?: boolean }
+
+// Simple Icons dropped LinkedIn at LinkedIn's request, so this one is drawn
+// here: the "in" cut out of a rounded square.
+const LINKEDIN: Mark = {
+  hex: '0A66C2',
+  evenOdd: true,
+  path:
+    'M4 2h16a2 2 0 0 1 2 2v16a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2z' +
+    'M7 5.5a1.5 1.5 0 1 1 0 3a1.5 1.5 0 1 1 0-3z' +
+    'M5.75 10h2.5v8h-2.5z' +
+    'M10.5 10h2.4v1.2c.5-.8 1.5-1.4 2.8-1.4c2.1 0 3.3 1.3 3.3 3.8V18h-2.5v-4c0-1.2-.5-1.9-1.5-1.9s-1.6.7-1.6 1.9v4h-2.9z',
+}
+
 // The real mark of each platform, drawn from Simple Icons. lucide carries no
 // brand marks, so these come from there and nowhere else.
-const MARKS: Record<string, SimpleIcon> = {
+const MARKS: Record<string, Mark> = {
+  linkedin: LINKEDIN,
   instagram: siInstagram,
   tiktok: siTiktok,
   youtube: siYoutube,
@@ -61,7 +76,7 @@ export function BrandIcon({ platform, className }: BrandIconProps) {
       aria-hidden='true'
       data-brand={platform.toLowerCase()}
     >
-      <path d={mark.path} />
+      <path d={mark.path} fillRule={mark.evenOdd ? 'evenodd' : undefined} />
     </svg>
   )
 }

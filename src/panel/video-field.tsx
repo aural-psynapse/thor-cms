@@ -88,8 +88,8 @@ export function VideoField({
       <span className='min-w-0 flex-1'>
         <span className='block truncate text-sm font-medium'>{label}</span>
 
-        {/* A refused file is the only thing worth reading, so it takes the
-            place of the size rules until she picks another. */}
+        {/* A refused file takes the place of the size rules until she picks
+            another. What is already here, or waiting for Save, still shows. */}
         {refused && <span className='text-destructive block text-xs'>{refused}</span>}
 
         {!refused && !filled && (
@@ -100,13 +100,13 @@ export function VideoField({
 
         {/* Without this the box looks exactly as empty after a file has gone
             up as before, which reads as nothing having happened. */}
-        {!refused && has && pickedName === undefined && (
+        {has && pickedName === undefined && (
           <span className='text-muted-foreground block text-xs'>
             A video is on this box. Replace swaps it.
           </span>
         )}
 
-        {!refused && pickedName !== undefined && (
+        {pickedName !== undefined && (
           <span className='text-muted-foreground block truncate text-xs'>
             {`${pickedName}, goes up when you save`}
           </span>

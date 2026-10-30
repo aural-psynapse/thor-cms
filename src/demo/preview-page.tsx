@@ -75,8 +75,17 @@ function Value({ field, value }: { field: StoredField; value: JsonValue | undefi
           ))}
         </ul>
       )
-    case 'custom':
-      return <p className='text-muted-foreground text-sm'>{JSON.stringify(value ?? null)}</p>
+    case 'custom': {
+      const text = typeof value === 'string' ? value : JSON.stringify(value ?? null)
+      return (
+        <p className='text-muted-foreground flex items-center gap-2 text-sm'>
+          {/^#[0-9a-f]{3,8}$/i.test(text) && (
+            <span className='size-4 rounded border' style={{ background: text }} />
+          )}
+          {text}
+        </p>
+      )
+    }
   }
 }
 

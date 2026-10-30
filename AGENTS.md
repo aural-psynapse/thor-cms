@@ -11,7 +11,7 @@ npm install
 npm run dev
 ```
 
-Open `http://localhost:5173/admin/`. Everything runs on fake data in memory. Edit a box, press Save, open Numbers and Fields. Do this before you change anything.
+Open the address `npm run dev` prints, ending in `/admin/` (usually `http://localhost:5173/admin/`). Everything runs on fake data in memory. Edit a box, press Save, open Numbers and Fields. Do this before you change anything.
 
 ## 2. Copy the panel
 

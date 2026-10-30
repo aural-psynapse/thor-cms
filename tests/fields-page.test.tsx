@@ -1,7 +1,8 @@
 import { screen, waitFor, within } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
 import { FIELD_TYPES, toStored, type StoredSection } from '@/panel/field-list'
-import { addField, addSection, fieldListProblem, nudgeSection, retype } from '@/panel/lib/field-edit'
+import { addField, addSection, fieldListProblem, nudgeSection, retype, retypeField } from '@/panel/lib/field-edit'
+import { VIDEO } from '@/panel/lib/video-check'
 import { lastSaved, mountPanel, recordingSlots, testFields } from './helpers'
 
 const stored = (): StoredSection[] => toStored(testFields)
@@ -51,6 +52,16 @@ describe('checking a field list', () => {
     const box = retype({ key: 'title', label: 'Heading', type: 'text' }, 'picture')
     expect(box).toMatchObject({ key: 'title', label: 'Heading', type: 'picture' })
     expect('rule' in box).toBe(true)
+  })
+
+  it('drops the old value of a retyped box, which the new type cannot read', () => {
+    const content = {
+      sections: [{ id: 'hero', label: 'Hero', fields: [{ key: 'photo', label: 'Photo', type: 'video' as const, rule: VIDEO }] }],
+      values: { hero: { photo: 'blob:old', other: 'kept' } },
+    }
+    const next = retypeField(content, 'hero', 'photo', 'text')
+    expect(next.sections[0]?.fields[0]?.type).toBe('text')
+    expect(next.values.hero).toEqual({ other: 'kept' })
   })
 })
 

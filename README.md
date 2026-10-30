@@ -9,7 +9,7 @@ npm install
 npm run dev
 ```
 
-Open `http://localhost:5173/admin/`. It runs on fake data in memory and needs no keys or network.
+Open the address `npm run dev` prints, ending in `/admin/` (usually `http://localhost:5173/admin/`). It runs on fake data in memory and needs no keys or network.
 
 ## Build it
 

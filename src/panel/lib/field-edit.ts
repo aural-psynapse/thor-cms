@@ -49,6 +49,19 @@ export function retype(field: StoredField, type: FieldType): StoredField {
   return field.type === type ? field : makeField(field.key, field.label, type)
 }
 
+/** Retypes a box and drops its saved value, which the new type cannot read. */
+export function retypeField(content: Content, sectionId: string, key: string, type: FieldType): Content {
+  const field = content.sections.find((s) => s.id === sectionId)?.fields.find((f) => f.key === key)
+  if (!field || field.type === type) return content
+  const { [key]: _dropped, ...kept } = content.values[sectionId] ?? {}
+  return {
+    sections: content.sections.map((s) =>
+      s.id === sectionId ? { ...s, fields: s.fields.map((f) => (f.key === key ? retype(f, type) : f)) } : s,
+    ),
+    values: { ...content.values, [sectionId]: kept },
+  }
+}
+
 function sameName(a: string, b: string): boolean {
   return a.trim().toLowerCase() === b.trim().toLowerCase()
 }

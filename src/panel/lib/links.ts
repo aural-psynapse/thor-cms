@@ -18,10 +18,10 @@ export const DEFAULT_PLATFORMS: Platform[] = [
 
 /**
  * What she typed has to be a link the browser will follow, or the page ends
- * up with a dead one on it.
+ * up with a dead one on it. Plain http:// is refused too: browsers warn on it.
  */
 export function linkProblem(url: string): string | null {
-  if (!/^https?:\/\/[^\s/]+\.\S+$/i.test(url.trim())) return 'A link starts with https://'
+  if (!/^https:\/\/[^\s/]+\.\S+$/i.test(url.trim())) return 'A link starts with https://'
   return null
 }
 

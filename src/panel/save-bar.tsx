@@ -61,13 +61,26 @@ export function SaveBar({ dirty, stage, problem, onSave, onCancel }: SaveBarProp
           ) : (
             <span className='text-muted-foreground'>{words}</span>
           )}
+          {stage.name === 'sending' && !red && (
+            <span
+              role='progressbar'
+              aria-label='Sending the video'
+              aria-valuenow={Math.round(stage.done * 100)}
+              className='bg-muted mt-1 block h-1.5 w-48 max-w-full overflow-hidden rounded-full'
+            >
+              <span
+                className='bg-primary block h-full transition-[width]'
+                style={{ width: `${Math.round(stage.done * 100)}%` }}
+              />
+            </span>
+          )}
         </span>
 
         {dirty && (
           <>
             <Button
               type='button'
-              variant='destructive'
+              variant='outline'
               disabled={busy}
               onClick={() => setAsking(true)}
             >

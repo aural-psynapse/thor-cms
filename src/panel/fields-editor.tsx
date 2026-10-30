@@ -13,7 +13,7 @@ import {
   nudgeSection,
   removeField,
   removeSection,
-  retype,
+  retypeField,
   type Added,
 } from './lib/field-edit'
 
@@ -136,15 +136,7 @@ export function FieldsEditor({ content, onChange }: FieldsEditorProps) {
                 <TypePicker
                   label={`Kind of box for ${field.label}`}
                   value={field.type}
-                  onChange={(type) =>
-                    setSections(
-                      sections.map((s) =>
-                        s.id === section.id
-                          ? { ...s, fields: s.fields.map((f) => (f.key === field.key ? retype(f, type) : f)) }
-                          : s,
-                      ),
-                    )
-                  }
+                  onChange={(type) => onChange(retypeField(content, section.id, field.key, type))}
                 />
                 <IconButton label={`Move ${field.label} up`} onClick={() => setSections(nudgeField(sections, section.id, field.key, -1))}>
                   <ArrowUp />

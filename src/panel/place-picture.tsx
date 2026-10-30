@@ -45,7 +45,13 @@ export function PlacePicture({
     picture.onload = () =>
       setSize({ width: picture.naturalWidth, height: picture.naturalHeight })
     picture.src = seeAt
-    return () => URL.revokeObjectURL(seeAt)
+    // Stop the load before the address goes, or the browser logs a missing
+    // file each time the box closes mid-load.
+    return () => {
+      picture.onload = null
+      picture.removeAttribute('src')
+      URL.revokeObjectURL(seeAt)
+    }
   }, [file])
 
   // How much of the picture is off the edge of the frame in each direction.

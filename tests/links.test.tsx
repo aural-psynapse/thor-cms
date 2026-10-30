@@ -1,6 +1,6 @@
 import { fireEvent, render, screen, waitFor, within } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
-import { BrandIcon, brandColour } from '@/panel/brand-icon'
+import { BrandIcon, brandColour, hasBrand } from '@/panel/brand-icon'
 import type { Content } from '@/panel/field-list'
 import { linkProblem } from '@/panel/lib/links'
 import { readLinks } from '@/panel/lib/values'
@@ -9,12 +9,11 @@ import { dragDown, lastSaved, mountPanel, recordingSlots, testFields } from './h
 describe('checking a link', () => {
   it('takes a web address', () => {
     expect(linkProblem('https://instagram.com/someone')).toBeNull()
-    expect(linkProblem('http://example.org')).toBeNull()
     expect(linkProblem('  https://example.org/a?b=c  ')).toBeNull()
   })
 
   it('says how a link starts when it is not one', () => {
-    for (const wrong of ['', 'instagram.com/someone', '@someone', 'https://', 'https://no spaces.com']) {
+    for (const wrong of ['', 'instagram.com/someone', '@someone', 'https://', 'https://no spaces.com', 'http://example.org']) {
       expect(linkProblem(wrong)).toBe('A link starts with https://')
     }
   })
@@ -24,6 +23,11 @@ describe('a platform mark', () => {
   it('draws the mark in the platform colour, and black marks in the text colour', () => {
     expect(brandColour('youtube')).toBe('#FF0000')
     expect(brandColour('tiktok')).toBeUndefined()
+  })
+
+  it('draws LinkedIn, which Simple Icons does not carry', () => {
+    expect(hasBrand('linkedin')).toBe(true)
+    expect(brandColour('linkedin')).toBe('#0A66C2')
   })
 
   it('draws nothing for a platform it does not know', () => {
