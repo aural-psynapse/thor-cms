@@ -1,7 +1,8 @@
 import { Card } from '@/components/ui/card'
 import { Label } from '@/components/ui/label'
 import type { CustomRender, JsonValue, StoredField } from './field-list'
-import { readPictures, readText } from './lib/values'
+import { ItemsBox } from './items-box'
+import { readItems, readPictures, readText } from './lib/values'
 import { MediaField } from './media-field'
 import { PictureRow } from './picture-row'
 import { VideoField } from './video-field'
@@ -86,6 +87,18 @@ export function FieldBox({ field, value, onChange, onLook, tools }: FieldBoxProp
         />
       )
     }
+    case 'items':
+      return (
+        <ItemsBox
+          label={field.label}
+          rule={field.rule}
+          value={readItems(value)}
+          onChange={onChange}
+          upload={tools.upload}
+          onLook={onLook}
+          disabled={tools.disabled}
+        />
+      )
     case 'custom': {
       const render = tools.renders.get(field.key)
       return (
