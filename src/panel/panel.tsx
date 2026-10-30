@@ -1,6 +1,9 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Eye, LoaderCircle } from 'lucide-react'
+import { Button } from '@/components/ui/button'
 import { TooltipProvider } from '@/components/ui/tooltip'
+import { cn } from '@/lib/utils'
+import { AnalyticsBoard, type NumbersState } from './analytics-board'
 import {
   rendersOf,
   startingContent,
@@ -9,6 +12,7 @@ import {
   type JsonValue,
 } from './field-list'
 import type { FieldTools } from './field-box'
+import { allLinks } from './lib/links'
 import { sameContent, videosWaiting, withValue } from './lib/content'
 import { waitForLive, type WaitParts } from './lib/wait-for-live'
 import { SaveBar, type SaveStage } from './save-bar'
@@ -17,6 +21,14 @@ import { SectionList } from './section-list'
 import { IconButton } from './icon-button'
 import { PreviewPane } from './preview-pane'
 import type { PreviewFocus, PreviewUpdate, Slots } from './slots'
+
+/** The panel's pages. */
+export type Page = 'edit' | 'numbers' | 'fields'
+
+const PAGES: { page: Page; name: string }[] = [
+  { page: 'edit', name: 'Edit' },
+  { page: 'numbers', name: 'Numbers' },
+]
 
 /** How often to ask whether a save is live, and when to give up. */
 export type LiveCheck = Pick<WaitParts, 'everyMs' | 'giveUpAfter' | 'pause'>
@@ -44,6 +56,10 @@ export function Panel({ fields, slots, title = 'Your site', liveCheck }: PanelPr
   const [pending, setPending] = useState<Map<string, File>>(() => new Map())
   const [focus, setFocus] = useState<PreviewFocus | null>(null)
   const [fullPreview, setFullPreview] = useState(false)
+  const [page, setPage] = useState<Page>('edit')
+  const [days, setDays] = useState(30)
+  const [numbers, setNumbers] = useState<NumbersState>({ name: 'loading' })
+  const [asked, setAsked] = useState(0)
   const renders = useMemo(() => rendersOf(fields), [fields])
   const update = useMemo<PreviewUpdate | null>(
     () => (draft ? { content: draft, focus } : null),
@@ -67,6 +83,25 @@ export function Panel({ fields, slots, title = 'Your site', liveCheck }: PanelPr
       gone = true
     }
   }, [fields, slots.content])
+
+  // The numbers are read when the page opens, when she picks another period,
+  // and when she presses Check again.
+  useEffect(() => {
+    if (page !== 'numbers') return
+    let gone = false
+    setNumbers({ name: 'loading' })
+    slots.numbers
+      .load(days)
+      .then((read) => {
+        if (!gone) setNumbers({ name: 'ready', numbers: read, at: Date.now() })
+      })
+      .catch((error: unknown) => {
+        if (!gone) setNumbers({ name: 'error', problem: String(error) })
+      })
+    return () => {
+      gone = true
+    }
+  }, [page, days, asked, slots.numbers])
 
   if (loadProblem) {
     return <p className='text-destructive p-6 text-sm'>{loadProblem}</p>
@@ -187,19 +222,46 @@ export function Panel({ fields, slots, title = 'Your site', liveCheck }: PanelPr
     <TooltipProvider>
       <div className='flex h-svh flex-col'>
         <header className='flex items-center gap-2 border-b px-4 py-2'>
-          <h1 className='me-auto text-base font-semibold'>{title}</h1>
+          <h1 className='text-base font-semibold'>{title}</h1>
+          <nav className='me-auto flex gap-1'>
+            {PAGES.map((one) => (
+              <Button
+                key={one.page}
+                type='button'
+                size='sm'
+                variant={page === one.page ? 'secondary' : 'ghost'}
+                aria-current={page === one.page ? 'page' : undefined}
+                onClick={() => setPage(one.page)}
+              >
+                {one.name}
+              </Button>
+            ))}
+          </nav>
           {/* On a phone there is no room beside the boxes, so the preview
               opens over the whole screen instead. */}
           <IconButton
             label='Show the preview'
-            className='lg:hidden'
+            className={cn('lg:hidden', page !== 'edit' && 'hidden')}
             onClick={() => setFullPreview(true)}
           >
             <Eye />
           </IconButton>
         </header>
 
-        <main className='flex min-h-0 flex-1 gap-4 p-4'>
+        {page === 'numbers' && (
+          <main className='min-h-0 flex-1 overflow-y-auto p-4'>
+            <AnalyticsBoard
+              days={days}
+              onDays={setDays}
+              state={numbers}
+              onRefresh={() => setAsked((n) => n + 1)}
+              sections={draft.sections}
+              links={allLinks(draft)}
+            />
+          </main>
+        )}
+
+        <main className={cn('flex min-h-0 flex-1 gap-4 p-4', page !== 'edit' && 'hidden')}>
           <div className='min-h-0 w-full overflow-y-auto lg:max-w-md'>
             {section ? (
               <SectionEditor
