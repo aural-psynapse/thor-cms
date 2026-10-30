@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { LoaderCircle } from 'lucide-react'
+import { Eye, LoaderCircle } from 'lucide-react'
 import { TooltipProvider } from '@/components/ui/tooltip'
 import {
   rendersOf,
@@ -14,7 +14,9 @@ import { waitForLive, type WaitParts } from './lib/wait-for-live'
 import { SaveBar, type SaveStage } from './save-bar'
 import { SectionEditor } from './section-editor'
 import { SectionList } from './section-list'
-import type { Slots } from './slots'
+import { IconButton } from './icon-button'
+import { PreviewPane } from './preview-pane'
+import type { PreviewFocus, PreviewUpdate, Slots } from './slots'
 
 /** How often to ask whether a save is live, and when to give up. */
 export type LiveCheck = Pick<WaitParts, 'everyMs' | 'giveUpAfter' | 'pause'>
@@ -40,7 +42,13 @@ export function Panel({ fields, slots, title = 'Your site', liveCheck }: PanelPr
   const [open, setOpen] = useState<string | null>(null)
   const [stage, setStage] = useState<SaveStage>({ name: 'resting' })
   const [pending, setPending] = useState<Map<string, File>>(() => new Map())
+  const [focus, setFocus] = useState<PreviewFocus | null>(null)
+  const [fullPreview, setFullPreview] = useState(false)
   const renders = useMemo(() => rendersOf(fields), [fields])
+  const update = useMemo<PreviewUpdate | null>(
+    () => (draft ? { content: draft, focus } : null),
+    [draft, focus],
+  )
 
   useEffect(() => {
     let gone = false
@@ -156,6 +164,11 @@ export function Panel({ fields, slots, title = 'Your site', liveCheck }: PanelPr
     )
   }
 
+  function openSection(id: string) {
+    setOpen(id)
+    setFocus({ section: id, field: null })
+  }
+
   function cancel() {
     setDraft(saved)
     setPending(new Map())
@@ -175,6 +188,15 @@ export function Panel({ fields, slots, title = 'Your site', liveCheck }: PanelPr
       <div className='flex h-svh flex-col'>
         <header className='flex items-center gap-2 border-b px-4 py-2'>
           <h1 className='me-auto text-base font-semibold'>{title}</h1>
+          {/* On a phone there is no room beside the boxes, so the preview
+              opens over the whole screen instead. */}
+          <IconButton
+            label='Show the preview'
+            className='lg:hidden'
+            onClick={() => setFullPreview(true)}
+          >
+            <Eye />
+          </IconButton>
         </header>
 
         <main className='flex min-h-0 flex-1 gap-4 p-4'>
@@ -185,17 +207,28 @@ export function Panel({ fields, slots, title = 'Your site', liveCheck }: PanelPr
                 values={draft.values[section.id] ?? {}}
                 onChange={(key, value) => setValue(section.id, key, value)}
                 onBack={() => setOpen(null)}
-                onLook={() => {}}
+                onLook={(key) => setFocus({ section: section.id, field: key })}
                 tools={tools}
               />
             ) : (
               <SectionList
                 sections={draft.sections}
                 onChange={(sections) => change({ ...draft, sections })}
-                onOpen={setOpen}
+                onOpen={openSection}
               />
             )}
           </div>
+
+          {update && (
+            <PreviewPane
+              url={slots.preview.url}
+              update={update}
+              push={slots.preview.push}
+              full={fullPreview}
+              onFull={setFullPreview}
+              className='hidden min-h-0 flex-1 lg:grid'
+            />
+          )}
         </main>
 
         {(dirty || stage.name !== 'resting') && (
