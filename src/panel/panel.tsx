@@ -1,9 +1,9 @@
-import { useEffect, useMemo, useState } from 'react'
+import { Suspense, lazy, useEffect, useMemo, useState } from 'react'
 import { Eye, LoaderCircle } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { TooltipProvider } from '@/components/ui/tooltip'
 import { cn } from '@/lib/utils'
-import { AnalyticsBoard, type NumbersState } from './analytics-board'
+import type { NumbersState } from './analytics-board'
 import {
   rendersOf,
   startingContent,
@@ -12,6 +12,8 @@ import {
   type JsonValue,
 } from './field-list'
 import type { FieldTools } from './field-box'
+import { FieldsEditor } from './fields-editor'
+import { fieldListProblem } from './lib/field-edit'
 import { allLinks } from './lib/links'
 import { sameContent, videosWaiting, withValue } from './lib/content'
 import { waitForLive, type WaitParts } from './lib/wait-for-live'
@@ -22,12 +24,19 @@ import { IconButton } from './icon-button'
 import { PreviewPane } from './preview-pane'
 import type { PreviewFocus, PreviewUpdate, Slots } from './slots'
 
+// The charts are most of the panel's weight, so they load only when the
+// Numbers page is opened.
+const AnalyticsBoard = lazy(() =>
+  import('./analytics-board').then((board) => ({ default: board.AnalyticsBoard })),
+)
+
 /** The panel's pages. */
 export type Page = 'edit' | 'numbers' | 'fields'
 
 const PAGES: { page: Page; name: string }[] = [
   { page: 'edit', name: 'Edit' },
   { page: 'numbers', name: 'Numbers' },
+  { page: 'fields', name: 'Fields' },
 ]
 
 /** How often to ask whether a save is live, and when to give up. */
@@ -162,6 +171,12 @@ export function Panel({ fields, slots, title = 'Your site', liveCheck }: PanelPr
 
   async function save() {
     if (!draft) return
+    // A field list the panel could not draw again is never saved.
+    const wrongList = fieldListProblem(draft.sections)
+    if (wrongList) {
+      setStage({ name: 'stuck', problem: wrongList })
+      return
+    }
     let sending: Content
     try {
       sending = await sendVideos(draft)
@@ -250,14 +265,22 @@ export function Panel({ fields, slots, title = 'Your site', liveCheck }: PanelPr
 
         {page === 'numbers' && (
           <main className='min-h-0 flex-1 overflow-y-auto p-4'>
-            <AnalyticsBoard
-              days={days}
-              onDays={setDays}
-              state={numbers}
-              onRefresh={() => setAsked((n) => n + 1)}
-              sections={draft.sections}
-              links={allLinks(draft)}
-            />
+            <Suspense fallback={<LoaderCircle className='size-4 animate-spin' />}>
+              <AnalyticsBoard
+                days={days}
+                onDays={setDays}
+                state={numbers}
+                onRefresh={() => setAsked((n) => n + 1)}
+                sections={draft.sections}
+                links={allLinks(draft)}
+              />
+            </Suspense>
+          </main>
+        )}
+
+        {page === 'fields' && (
+          <main className='min-h-0 flex-1 overflow-y-auto p-4'>
+            <FieldsEditor content={draft} onChange={change} />
           </main>
         )}
 
