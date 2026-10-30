@@ -1,0 +1,226 @@
+// Every word the panel itself puts on screen. A site that wants the panel in
+// another language changes this one file and nothing else, so an update to the
+// panel's code never undoes the translation. Words that come from the field
+// list (section and box names) live in that list instead.
+//
+// A line that carries a name or a number is a small function, so a language
+// that puts the name somewhere else in the sentence can.
+
+/** The panel's own words, grouped by where they appear. */
+export const WORDS = {
+  yourSite: 'Your site',
+  locale: 'en-GB',
+
+  pages: {
+    edit: {
+      name: 'Edit',
+      blurb: 'Change the site one section at a time. Drag to reorder, switch off what you do not want.',
+    },
+    numbers: { name: 'Numbers', blurb: 'How many people came to the site, and what they did there.' },
+    fields: { name: 'Fields', blurb: 'Which boxes each section has. Add, rename or remove them.' },
+  },
+
+  menu: {
+    subtitle: 'Admin panel',
+    group: 'Site',
+    narrow: 'Narrow the menu',
+    widen: 'Widen the menu',
+    openMenu: 'Open the menu',
+    theme: 'Theme',
+    light: 'Light',
+    dark: 'Dark',
+    system: 'Same as my computer',
+    backToSite: 'Back to the site',
+  },
+
+  loading: 'Loading your site…',
+  loadFailed: (why: string) => `Your content could not be loaded: ${why}`,
+
+  sections: {
+    allSections: 'All sections',
+    nothingHere: 'Nothing to change here yet.',
+    notOnSite: 'not on the site',
+    alwaysOn: 'always on',
+    show: (name: string) => `Show ${name} on the site`,
+    hide: (name: string) => `Hide ${name} from the site`,
+    showTip: 'Show this section',
+    hideTip: 'Hide this section',
+    drag: 'Drag to reorder',
+    needsCode: 'This box needs code from whoever set up your site.',
+  },
+
+  save: {
+    save: 'Save',
+    cancel: 'Discard changes',
+    cancelTitle: 'Discard your changes?',
+    cancelAction: 'Discard',
+    cancelBody: 'Everything goes back to how it was when you last saved. What you changed since is lost.',
+    sendingVideo: (percent: number) => `Sending the video, ${percent}%`,
+    sendingVideoBar: 'Sending the video',
+    saving: 'Saving…',
+    waiting: 'Saved. Putting it on the site…',
+    live: 'Your change is on the live site.',
+    slow: 'Your change is saved, but the site is taking longer than usual to update. Check back in a few minutes.',
+    failed: (why: string) => `Nothing was saved: ${why}`,
+    videoFailed: (why: string) => `Nothing was saved: the video did not go up. ${why}`,
+  },
+
+  ask: {
+    keep: 'Keep it',
+    remove: 'Remove',
+    delete: 'Delete',
+    comesOff: 'It comes off the site when you save.',
+  },
+
+  preview: {
+    show: 'Show the preview',
+    frameTitle: 'Your site',
+    phone: 'Phone',
+    laptop: 'Laptop',
+    phoneSize: 'Show it phone size',
+    laptopSize: 'Show it laptop size',
+    full: 'Full screen',
+    leaveFull: 'Leave full screen',
+  },
+
+  picture: {
+    takes: (types: string, size: string) => `${types}, at least ${size}\nAny shape, you pick what shows`,
+    takesAnyShape: (types: string, smallest: number) => `${types}, at least ${smallest} across the short side`,
+    uprightOrWide: (w: number, h: number) => `${h}×${w} upright or ${w}×${h} wide`,
+    sending: (percent: number) => `Sending, ${percent}%`,
+    notAPicture: 'That file is not a picture.',
+    unreadable: 'That picture could not be read.',
+    didNotGoUp: (why: string) => `The picture did not go up: ${why}`,
+    shrinking: 'Making the photo smaller',
+    replace: (label: string) => `Replace ${label.toLowerCase()}`,
+    upload: (label: string) => `Upload ${label.toLowerCase()}`,
+    numbered: (n: number) => `Picture ${n}`,
+    removeNumbered: (n: number) => `Remove picture ${n}`,
+    removeNumberedTitle: (n: number) => `Remove picture ${n}?`,
+    add: 'Add a picture',
+    dragToChoose: (label: string) => `Drag ${label.toLowerCase()} to choose what shows`,
+    frameNote: 'This box is the size the site draws it. Only what you can see here goes on the site.',
+    cancel: 'Cancel',
+    useThis: 'Use this',
+    or: ' or ',
+    takesTypes: (types: string) => `This spot takes ${types} files.`,
+    tooSmall: (w: number, h: number, wantW: number, wantH: number) =>
+      `Your picture is ${w}×${h}, too small. This spot needs at least ${wantW}×${wantH}. Pick a larger one.`,
+    cannotShrink: 'This browser cannot shrink pictures.',
+  },
+
+  video: {
+    takes: (types: string, mb: number, shapes: string) => `${types}, up to ${mb} MB\n${shapes}`,
+    onBox: 'A video is on this box. Replace swaps it.',
+    notAVideo: 'That file is not a video.',
+    goesUp: (file: string) => `${file}, goes up when you save`,
+    shapes: (least: number, long: number) => `${least}×${long} upright or ${long}×${least} wide`,
+    tooBig: (mb: number) => `That video is over ${mb} MB. Make it shorter first.`,
+    wrongShape: (got: string, shapes: string) =>
+      `Your video is ${got}. This spot takes ${shapes}. Crop it to one of those and pick it again.`,
+    tooSmall: (got: string, shapes: string) =>
+      `Your video is ${got}, too small. This spot takes ${shapes}. Pick a larger one.`,
+  },
+
+  items: {
+    allFolders: 'All folders',
+    thisItem: 'this item',
+    moveTo: (name: string) => `Move ${name} to`,
+    inFolder: (folder: string) => `In ${folder}`,
+    inNoFolder: 'In no folder, off the site',
+    remove: (name: string) => `Remove ${name}`,
+    removeTitle: (name: string) => `Remove ${name}?`,
+    name: 'Name',
+    tag: 'Tag',
+    pictureOf: (name: string) => `Picture of ${name}`,
+  },
+
+  folders: {
+    empty: 'No items, so it is off the site',
+    delete: (name: string) => `Delete ${name}`,
+    deleteTitle: (name: string) => `Delete ${name}?`,
+    open: 'Open its items',
+    name: 'Folder name',
+    deleteEmpty: 'It holds nothing, so only the heading goes.',
+    deleteFull: (count: string) =>
+      `Its ${count} are kept, but they come off the site until you put them in another folder.`,
+    loose: (count: string) => `${count}, not on the site`,
+    newName: 'Name of the new folder',
+    add: 'Add this folder',
+    dontAdd: 'Do not add a folder',
+  },
+
+  links: {
+    where: (name: string) => `Where ${name} is`,
+    remove: (name: string) => `Remove ${name}`,
+    removeTitle: (name: string) => `Remove ${name}?`,
+    text: 'What the page shows',
+    url: 'Where it goes',
+    notALink: 'A link starts with https://',
+  },
+
+  fields: {
+    sectionName: 'Section name',
+    boxName: 'Box name',
+    moveUp: (name: string) => `Move ${name} up`,
+    moveDown: (name: string) => `Move ${name} down`,
+    remove: (name: string) => `Remove ${name}`,
+    removeTitle: (name: string) => `Remove ${name}?`,
+    kindOf: (name: string) => `Kind of box for ${name}`,
+    newBoxIn: (section: string) => `New box in ${section}`,
+    newBox: 'New box',
+    kindOfNew: (section: string) => `Kind of new box in ${section}`,
+    addBox: 'Add box',
+    newSectionName: 'New section name',
+    newSection: 'New section',
+    addSection: 'Add section',
+    removeSectionBody: 'The section and everything in it come off the site when you save.',
+    removeBoxBody: 'The box and what is in it come off the site when you save.',
+    sectionNeedsName: 'Every section needs a name.',
+    twoSections: (id: string) => `Two sections are called "${id}". Give one of them another name.`,
+    boxNeedsName: (section: string) => `Every box in ${section} needs a name.`,
+    twoBoxes: (section: string, key: string) =>
+      `Two boxes in ${section} are called "${key}". Give one of them another name.`,
+    nameNewBox: 'Give the new box a name.',
+    sectionGone: 'That section is gone.',
+    boxTaken: (name: string, section: string) =>
+      `There is already a box called "${name}" in ${section}. Pick another name.`,
+    nameNewSection: 'Give the new section a name.',
+    sectionTaken: (name: string) => `There is already a section called "${name}". Pick another name.`,
+  },
+
+  numbers: {
+    days: (n: number) => `${n} days`,
+    readAt: (time: string) => `Read at ${time}`,
+    checkAgain: 'Check again',
+    off: 'Counting is not switched on for this site yet.',
+    ofVisits: (percent: number) => `${percent}% of visits`,
+    visits: 'Visits',
+    visitsUnder: 'People who opened the site',
+    plays: 'Plays',
+    playsUnder: 'Times a video was started',
+    watched: 'Time watched',
+    watchedUnder: 'Everyone added together',
+    through: 'Watched through',
+    throughUnder: 'How far into a video people get',
+    byDay: 'Visits by day',
+    against: 'Visits against plays',
+    inLast: (n: number, days: number) => `${n} in the last ${days} days`,
+    mostWatched: 'Most watched',
+    noPlays: 'Nobody has pressed play yet.',
+    playedMost: 'The videos people played most.',
+    stays: (stay: string, length: string) => `stays ${stay} of ${length}`,
+    playsCount: (n: number) => `${n} plays`,
+    againstBlurb: 'How many came, and how many pressed play',
+    pressed: 'What they pressed',
+    pressedBlurb: 'The links on your site',
+    times: (n: number) => (n === 1 ? 'once' : `${n} times`),
+    spend: 'Where they spend their time',
+    spendBlurb: 'How long one visit lasts on each section',
+    visitCount: (n: number) => `${n} ${n === 1 ? 'visit' : 'visits'}`,
+    from: 'Where they came from',
+    fromBlurb: 'The page they were on before',
+    country: 'Which country',
+    countryBlurb: 'Where they opened the site',
+  },
+} as const
