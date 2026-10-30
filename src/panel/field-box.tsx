@@ -2,7 +2,9 @@ import { Card } from '@/components/ui/card'
 import { Label } from '@/components/ui/label'
 import type { CustomRender, JsonValue, StoredField } from './field-list'
 import { ItemsBox } from './items-box'
-import { readItems, readPictures, readText } from './lib/values'
+import { DEFAULT_PLATFORMS } from './lib/links'
+import { readItems, readLinks, readPictures, readText } from './lib/values'
+import { LinkList } from './link-list'
 import { MediaField } from './media-field'
 import { PictureRow } from './picture-row'
 import { VideoField } from './video-field'
@@ -95,6 +97,17 @@ export function FieldBox({ field, value, onChange, onLook, tools }: FieldBoxProp
           value={readItems(value)}
           onChange={onChange}
           upload={tools.upload}
+          onLook={onLook}
+          disabled={tools.disabled}
+        />
+      )
+    case 'links':
+      return (
+        <LinkList
+          label={field.label}
+          links={readLinks(value)}
+          platforms={field.platforms ?? DEFAULT_PLATFORMS}
+          onChange={onChange}
           onLook={onLook}
           disabled={tools.disabled}
         />

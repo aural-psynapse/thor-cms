@@ -1,8 +1,8 @@
-import { act, fireEvent, screen, waitFor, within } from '@testing-library/react'
-import { afterEach, describe, expect, it } from 'vitest'
+import { fireEvent, screen, waitFor, within } from '@testing-library/react'
+import { describe, expect, it } from 'vitest'
 import type { Content } from '@/panel/field-list'
 import { readItems } from '@/panel/lib/values'
-import { lastSaved, mountPanel, recordingSlots } from './helpers'
+import { dragDown, lastSaved, mountPanel, recordingSlots } from './helpers'
 
 const start: Content = {
   sections: [],
@@ -125,29 +125,10 @@ describe('items', () => {
 })
 
 describe('dragging an item', () => {
-  const original = Element.prototype.getBoundingClientRect
-  afterEach(() => {
-    Element.prototype.getBoundingClientRect = original
-  })
-
   it('reorders it inside its folder', async () => {
-    Element.prototype.getBoundingClientRect = function place(this: Element) {
-      const card = this.closest('[data-item]')
-      if (!card) return DOMRect.fromRect({ x: 0, y: 0, width: 300, height: 1000 })
-      const at = [...document.querySelectorAll('[data-item]')].indexOf(card)
-      return DOMRect.fromRect({ x: 0, y: at * 300, width: 300, height: 280 })
-    }
     const { user, content } = await openShop()
     await user.click(within(folder('cups')).getByRole('button', { name: 'Open its items' }))
-    const tall = document.querySelector('[data-item="tall"]') as HTMLElement
-    const grip = within(tall).getByRole('button', { name: 'Drag to reorder' })
-    grip.focus()
-    for (const code of ['Space', 'ArrowDown', 'Space']) {
-      await act(async () => {
-        fireEvent.keyDown(document.activeElement ?? grip, { code })
-        await new Promise((done) => setTimeout(done, 10))
-      })
-    }
+    await dragDown('data-item', 'tall')
     const value = await saved(content)
     expect(value.items.filter((i) => i.collection === 'cups').map((i) => i.id)).toEqual([
       'small',

@@ -1,6 +1,6 @@
 import { act, fireEvent, screen, waitFor, within } from '@testing-library/react'
-import { afterEach, describe, expect, it, vi } from 'vitest'
-import { lastSaved, mountPanel, recordingSlots, testFields } from './helpers'
+import { describe, expect, it, vi } from 'vitest'
+import { dragDown, lastSaved, mountPanel, recordingSlots, testFields } from './helpers'
 
 function sectionNames(): string[] {
   return [...document.querySelectorAll('[data-section]')].map(
@@ -47,36 +47,11 @@ describe('the panel drawn from a field list', () => {
 })
 
 describe('dragging a section', () => {
-  // jsdom lays nothing out, so each card is given a place by its order on the
-  // page, which is all the keyboard drag needs to find its neighbours.
-  const original = Element.prototype.getBoundingClientRect
-  afterEach(() => {
-    Element.prototype.getBoundingClientRect = original
-  })
-
   it('moves it down the page with the keyboard, and saves the new order', async () => {
-    Element.prototype.getBoundingClientRect = function place(this: Element) {
-      const card = this.closest('[data-section]')
-      // anything around the cards, like the list itself, holds all of them
-      if (!card) return DOMRect.fromRect({ x: 0, y: 0, width: 300, height: 1000 })
-      const at = [...document.querySelectorAll('[data-section]')].indexOf(card)
-      return DOMRect.fromRect({ x: 0, y: at * 60, width: 300, height: 50 })
-    }
     const { slots, content } = recordingSlots()
     await mountPanel(slots)
-    const hero = document.querySelector('[data-section="hero"]') as HTMLElement
-    const grip = within(hero).getByRole('button', { name: 'Drag to reorder' })
-    grip.focus()
-    // the drag listens for the arrows a moment after it starts
-    const press = async (code: string) =>
-      act(async () => {
-        fireEvent.keyDown(document.activeElement ?? grip, { code })
-        await new Promise((done) => setTimeout(done, 10))
-      })
-    await press('Space')
-    await press('ArrowDown')
-    await press('Space')
-    await waitFor(() => expect(sectionNames().slice(0, 3)).toEqual(['top', 'gallery', 'hero']))
+    await dragDown('data-section', 'hero')
+    expect(sectionNames().slice(0, 3)).toEqual(['top', 'gallery', 'hero'])
 
     fireEvent.click(screen.getByRole('button', { name: 'Save' }))
     await waitFor(() => expect(content.save).toHaveBeenCalled())

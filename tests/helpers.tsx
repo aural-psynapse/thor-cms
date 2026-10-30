@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react'
+import { act, fireEvent, render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { vi } from 'vitest'
 import type { Content, FieldList } from '@/panel/field-list'
@@ -78,6 +78,36 @@ export async function mountPanel(
   )
   await screen.findByText('Hero')
   return user
+}
+
+/**
+ * Drags the row `id` one place down with the keyboard: grip, Space, the down
+ * arrow, Space. jsdom lays nothing out, so each row of `attr` is given a place
+ * by its order on the page for the length of the drag.
+ */
+export async function dragDown(attr: string, id: string): Promise<void> {
+  const original = Element.prototype.getBoundingClientRect
+  Element.prototype.getBoundingClientRect = function place(this: Element) {
+    const row = this.closest(`[${attr}]`)
+    // anything around the rows, like the list itself, holds all of them
+    if (!row) return DOMRect.fromRect({ x: 0, y: 0, width: 300, height: 5000 })
+    const at = [...document.querySelectorAll(`[${attr}]`)].indexOf(row)
+    return DOMRect.fromRect({ x: 0, y: at * 300, width: 300, height: 280 })
+  }
+  try {
+    const row = document.querySelector(`[${attr}="${id}"]`) as HTMLElement
+    const grip = within(row).getByRole('button', { name: 'Drag to reorder' })
+    grip.focus()
+    // the drag listens for the arrows a moment after it starts
+    for (const code of ['Space', 'ArrowDown', 'Space']) {
+      await act(async () => {
+        fireEvent.keyDown(document.activeElement ?? grip, { code })
+        await new Promise((done) => setTimeout(done, 10))
+      })
+    }
+  } finally {
+    Element.prototype.getBoundingClientRect = original
+  }
 }
 
 /** The content last given to the content code's save. */
