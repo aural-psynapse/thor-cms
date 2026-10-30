@@ -23,6 +23,10 @@ import { SectionList } from './section-list'
 import { IconButton } from './icon-button'
 import { PreviewPane } from './preview-pane'
 import { PAGES, PanelMenu, type Page } from './panel-menu'
+
+export type { Page }
+
+const ALL_PAGES: Page[] = PAGES.map((p) => p.page)
 import { WORDS } from './words'
 import type { PreviewFocus, PreviewUpdate, Slots } from './slots'
 
@@ -43,6 +47,12 @@ export type PanelProps = {
   title?: string
   /** Where the menu's "Back to the site" button goes. */
   siteUrl?: string
+  /**
+   * The pages the owner gets, in menu order. All three by default. A site
+   * whose design never changes leaves out "fields"; one that counts nothing
+   * leaves out "numbers".
+   */
+  pages?: Page[]
   liveCheck?: LiveCheck
 }
 
@@ -51,7 +61,14 @@ export type PanelProps = {
  * draft beside what was last saved, and only calls the content code when she
  * presses Save.
  */
-export function Panel({ fields, slots, title = WORDS.yourSite, siteUrl = '/', liveCheck }: PanelProps) {
+export function Panel({
+  fields,
+  slots,
+  title = WORDS.yourSite,
+  siteUrl = '/',
+  pages = ALL_PAGES,
+  liveCheck,
+}: PanelProps) {
   const [saved, setSaved] = useState<Content | null>(null)
   const [draft, setDraft] = useState<Content | null>(null)
   const [loadProblem, setLoadProblem] = useState<string | null>(null)
@@ -60,7 +77,14 @@ export function Panel({ fields, slots, title = WORDS.yourSite, siteUrl = '/', li
   const [pending, setPending] = useState<Map<string, File>>(() => new Map())
   const [focus, setFocus] = useState<PreviewFocus | null>(null)
   const [fullPreview, setFullPreview] = useState(false)
-  const [page, setPage] = useState<Page>('edit')
+  // A site can leave pages out of the menu. A page left out is never open,
+  // whatever was picked before.
+  const shown = useMemo(() => {
+    const kept = PAGES.filter((p) => pages.includes(p.page))
+    return kept.length > 0 ? kept : PAGES.slice(0, 1)
+  }, [pages])
+  const [picked, setPage] = useState<Page>(shown[0]?.page ?? 'edit')
+  const page = shown.some((p) => p.page === picked) ? picked : (shown[0]?.page ?? 'edit')
   const [days, setDays] = useState(30)
   const [numbers, setNumbers] = useState<NumbersState>({ name: 'loading' })
   const [asked, setAsked] = useState(0)
@@ -227,12 +251,12 @@ export function Panel({ fields, slots, title = WORDS.yourSite, siteUrl = '/', li
     holdVideo,
   }
 
-  const here = PAGES.find((p) => p.page === page) ?? PAGES[0]
+  const here = shown.find((p) => p.page === page) ?? PAGES[0]
 
   return (
     <TooltipProvider>
       <SidebarProvider>
-        <PanelMenu title={title} page={page} onPage={setPage} siteUrl={siteUrl} />
+        <PanelMenu title={title} pages={shown} page={page} onPage={setPage} siteUrl={siteUrl} />
 
         {/* Every page fills the screen: its columns scroll inside themselves,
             and the save bar sits under them at the bottom. */}

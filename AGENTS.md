@@ -98,6 +98,10 @@ Decide per site how big a picture and a video may be, and set them in the rules 
 
 Every word the panel itself shows sits in `src/panel/words.ts`. To put the panel in another language, translate that one file and set its `locale`. Change no other file for this, so a later copy of the panel's code keeps the translation when you carry `words.ts` across.
 
+## 6c. Pick the pages the owner sees
+
+`<Panel pages={['edit']} />` shows only the edit page. Leave out `'fields'` when the site's design draws a fixed set of boxes: a box added there would never show on the site. Leave out `'numbers'` when the site counts nothing. All three show by default.
+
 ## 7. Build and copy
 
 ```bash

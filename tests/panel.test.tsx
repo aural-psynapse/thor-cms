@@ -1,4 +1,5 @@
-import { act, fireEvent, screen, waitFor, within } from '@testing-library/react'
+import { act, fireEvent, render, screen, waitFor, within } from '@testing-library/react'
+import { Panel } from '@/panel/panel'
 import { describe, expect, it, vi } from 'vitest'
 import { dragDown, lastSaved, mountPanel, recordingSlots, testFields } from './helpers'
 
@@ -23,6 +24,22 @@ describe('the panel drawn from a field list', () => {
     ])
     expect(screen.getByText('Menu of the day')).toBeTruthy()
     expect(sectionNames()).toEqual(['hero', 'menu'])
+  })
+
+  it('shows only the pages the site asks for', async () => {
+    const { slots, numbers } = recordingSlots()
+    await mountPanel(slots, testFields, ['edit'])
+    expect(screen.getByRole('button', { name: 'Edit' })).toBeTruthy()
+    expect(screen.queryByRole('button', { name: 'Numbers' })).toBeNull()
+    expect(screen.queryByRole('button', { name: 'Fields' })).toBeNull()
+    expect(numbers.load).not.toHaveBeenCalled()
+  })
+
+  it('opens the first page it shows when the edit page is left out', async () => {
+    const { slots } = recordingSlots()
+    render(<Panel fields={testFields} slots={slots} pages={['fields']} />)
+    expect(await screen.findByRole('heading', { name: 'Fields' })).toBeTruthy()
+    expect(screen.queryByRole('button', { name: 'Edit' })).toBeNull()
   })
 
   it('holds fixed sections in place, with no grip and no switch', async () => {

@@ -85,6 +85,8 @@ const CHOICES = [
 /** The left menu: the site's name, the pages, and two buttons at the bottom. */
 export type PanelMenuProps = {
   title: string
+  /** The pages this site shows, in menu order. */
+  pages: PageInfo[]
   page: Page
   onPage: (page: Page) => void
   /** Where "Back to the site" goes. */
@@ -95,7 +97,7 @@ export type PanelMenuProps = {
  * The menu down the left side. On a laptop it narrows to a strip of icons; on
  * a phone it slides away and the button in the slim top bar brings it back.
  */
-export function PanelMenu({ title, page, onPage, siteUrl }: PanelMenuProps) {
+export function PanelMenu({ title, pages, page, onPage, siteUrl }: PanelMenuProps) {
   const { open, state, setOpenMobile } = useSidebar()
   const [theme, setTheme] = useTheme()
   const current = CHOICES.find((c) => c.value === theme) ?? CHOICES[2]
@@ -138,7 +140,7 @@ export function PanelMenu({ title, page, onPage, siteUrl }: PanelMenuProps) {
         <SidebarGroup>
           <SidebarGroupLabel>{WORDS.menu.group}</SidebarGroupLabel>
           <SidebarMenu>
-            {PAGES.map((one) => (
+            {pages.map((one) => (
               <SidebarMenuItem key={one.page}>
                 <SidebarMenuButton
                   isActive={page === one.page}

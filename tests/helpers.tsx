@@ -5,7 +5,7 @@ import type { Content, FieldList } from '@/panel/field-list'
 import { emptyNumbers } from '@/panel/lib/numbers'
 import { SQUARE, WIDE } from '@/panel/lib/picture-rules'
 import { VIDEO } from '@/panel/lib/video-check'
-import { Panel } from '@/panel/panel'
+import { Panel, type Page } from '@/panel/panel'
 import type { Slots, UploadOptions } from '@/panel/slots'
 
 /** A small site with one of every kind of box. */
@@ -67,12 +67,14 @@ export function recordingSlots(start: Content | null = null) {
 export async function mountPanel(
   slots: Slots,
   fields: FieldList = testFields,
+  pages?: Page[],
 ) {
   const user = userEvent.setup()
   render(
     <Panel
       fields={fields}
       slots={slots}
+      pages={pages}
       liveCheck={{ everyMs: 0, giveUpAfter: 3, pause: async () => {} }}
     />,
   )
