@@ -37,6 +37,7 @@ export const WORDS = {
     menuTitle: 'Menu',
     menuBlurb: 'The pages of the admin panel.',
     toggle: 'Narrow or widen the menu',
+    close: 'Close',
   },
 
   loading: 'Loading your site…',
