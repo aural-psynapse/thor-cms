@@ -90,6 +90,12 @@ export type Section<F = Field> = {
   locked?: boolean
   /** Switched off: kept, but not on the site. */
   hidden?: boolean
+  /**
+   * 'settings' for a section that is not a band of the page, like the search
+   * engine title or the contact details. It leaves the Edit page's list and
+   * shows on the Settings page instead.
+   */
+  page?: 'settings'
   fields: F[]
 }
 

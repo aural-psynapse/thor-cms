@@ -17,6 +17,10 @@ export const WORDS = {
       blurb: 'Change the site one section at a time. Drag to reorder, switch off what you do not want.',
     },
     numbers: { name: 'Numbers', blurb: 'How many people came to the site, and what they did there.' },
+    settings: {
+      name: 'Settings',
+      blurb: 'What sits outside the page itself: how search engines show the site, contact details, and the like.',
+    },
     fields: {
       name: 'Fields',
       blurb: 'The sections of your site and the boxes in each. Changes show in the editor at once and go on the site when you save.',

@@ -20,6 +20,7 @@ import { waitForLive, type WaitParts } from './lib/wait-for-live'
 import { SaveBar, type SaveStage } from './save-bar'
 import { SectionEditor } from './section-editor'
 import { SectionList } from './section-list'
+import { SettingsPage } from './settings-page'
 import { IconButton } from './icon-button'
 import { PreviewPane } from './preview-pane'
 import { PAGES, PanelMenu, type Page } from './panel-menu'
@@ -66,7 +67,7 @@ export function Panel({
   slots,
   title = WORDS.yourSite,
   siteUrl = '/',
-  pages = ALL_PAGES,
+  pages,
   liveCheck,
 }: PanelProps) {
   const [saved, setSaved] = useState<Content | null>(null)
@@ -79,10 +80,15 @@ export function Panel({
   const [fullPreview, setFullPreview] = useState(false)
   // A site can leave pages out of the menu. A page left out is never open,
   // whatever was picked before.
+  // Left to itself, the panel shows Settings only when the field list has a
+  // section that belongs there.
   const shown = useMemo(() => {
-    const kept = PAGES.filter((p) => pages.includes(p.page))
+    const wanted =
+      pages ??
+      ALL_PAGES.filter((p) => p !== 'settings' || fields.some((s) => s.page === 'settings'))
+    const kept = PAGES.filter((p) => wanted.includes(p.page))
     return kept.length > 0 ? kept : PAGES.slice(0, 1)
-  }, [pages])
+  }, [pages, fields])
   const [picked, setPage] = useState<Page>(shown[0]?.page ?? 'edit')
   const page = shown.some((p) => p.page === picked) ? picked : (shown[0]?.page ?? 'edit')
   const [days, setDays] = useState(30)
@@ -145,6 +151,9 @@ export function Panel({
   const dirty = !sameContent(draft, saved)
   const busy = stage.name === 'sending' || stage.name === 'saving'
   const section = draft.sections.find((s) => s.id === open) ?? null
+  // Bands of the page go in the Edit list; the rest sit on the Settings page.
+  const bands = draft.sections.filter((s) => s.page !== 'settings')
+  const settingsSections = draft.sections.filter((s) => s.page === 'settings')
 
   // Any change after a save is finished starts a new round, so an old "live"
   // or a red line from before does not hang around over new work.
@@ -302,6 +311,17 @@ export function Panel({
               </div>
             )}
 
+            {page === 'settings' && (
+              <div className='min-h-0 flex-1 overflow-y-auto pe-1 pb-6'>
+                <SettingsPage
+                  sections={settingsSections}
+                  values={draft.values}
+                  onChange={setValue}
+                  tools={tools}
+                />
+              </div>
+            )}
+
             <div className={cn('flex min-h-0 flex-1 gap-4', page !== 'edit' && 'hidden')}>
               {/* Only this column scrolls. The site beside it stays put. */}
               <div className='min-h-0 w-full shrink-0 overflow-y-auto pe-1 pb-2 lg:w-[460px]'>
@@ -316,8 +336,9 @@ export function Panel({
                   />
                 ) : (
                   <SectionList
-                    sections={draft.sections}
-                    onChange={(sections) => change({ ...draft, sections })}
+                    sections={bands}
+                    // The settings sections keep their places after the bands.
+                    onChange={(next) => change({ ...draft, sections: [...next, ...settingsSections] })}
                     onOpen={openSection}
                   />
                 )}
