@@ -1,6 +1,7 @@
 // What a video box will take. A video goes up as it is, nothing is cut, so its
 // type, size and shape all have to be ones the site can play.
 
+import { WORDS } from '../words'
 import { typeProblem } from './picture-rules'
 
 /** What one video box takes. Plain data, so it saves with the field list. */
@@ -33,7 +34,7 @@ function sameRatio(a: number, b: number): boolean {
 /** The two shapes the box takes, in words: "1080×1920 upright or 1920×1080 wide". */
 export function saysShapes(rule: VideoRule): string {
   const long = Math.round((rule.least * 16) / 9)
-  return `${rule.least}×${long} upright or ${long}×${rule.least} wide`
+  return WORDS.video.shapes(rule.least, long)
 }
 
 /** What is wrong with the file before it is opened, or nothing. */
@@ -41,11 +42,11 @@ export function videoFileProblem(
   file: { type: string; size: number },
   rule: VideoRule,
 ): string | null {
-  if (!file.type.startsWith('video/')) return 'That file is not a video.'
+  if (!file.type.startsWith('video/')) return WORDS.video.notAVideo
   const wrongType = typeProblem(file.type, rule.types)
   if (wrongType) return wrongType
   if (file.size > rule.biggestMb * 1024 * 1024) {
-    return `That video is over ${rule.biggestMb} MB. Make it shorter first.`
+    return WORDS.video.tooBig(rule.biggestMb)
   }
   return null
 }
@@ -63,10 +64,10 @@ export function videoShapeProblem(
   const upright = height > 0 && sameRatio(width / height, 9 / 16)
   const wide = height > 0 && sameRatio(width / height, 16 / 9)
   if (!upright && !wide) {
-    return `Your video is ${got}. This spot takes ${saysShapes(rule)}. Crop it to one of those and pick it again.`
+    return WORDS.video.wrongShape(got, saysShapes(rule))
   }
   if (Math.min(width, height) < rule.least) {
-    return `Your video is ${got}, too small. This spot takes ${saysShapes(rule)}. Pick a larger one.`
+    return WORDS.video.tooSmall(got, saysShapes(rule))
   }
   return null
 }

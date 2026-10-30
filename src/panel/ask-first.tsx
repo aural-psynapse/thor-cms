@@ -10,6 +10,7 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
 import { RED } from './icon-button'
+import { WORDS } from './words'
 
 /** The question asked before anything is removed. */
 export type AskFirstProps = {
@@ -44,7 +45,7 @@ export function AskFirst({
           <AlertDialogDescription>{children}</AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel>Keep it</AlertDialogCancel>
+          <AlertDialogCancel>{WORDS.ask.keep}</AlertDialogCancel>
           <AlertDialogAction className={RED} onClick={onConfirm}>
             {action}
           </AlertDialogAction>

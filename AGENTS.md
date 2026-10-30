@@ -94,6 +94,10 @@ The panel has no login. The site must stop anyone else reaching `/admin` and the
 
 Decide per site how big a picture and a video may be, and set them in the rules in `src/fields.tsx`. The panel refuses anything outside the rules before it reaches your files code. Your storage may still have its own limit; keep the rules inside it.
 
+## 6b. Set the panel's language
+
+Every word the panel itself shows sits in `src/panel/words.ts`. To put the panel in another language, translate that one file and set its `locale`. Change no other file for this, so a later copy of the panel's code keeps the translation when you carry `words.ts` across.
+
 ## 7. Build and copy
 
 ```bash

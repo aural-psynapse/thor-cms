@@ -2,6 +2,7 @@
 // is the part that stops a wrong file before it is sent, and says in one plain
 // line what is wrong with it.
 
+import { WORDS } from '../words'
 import { cutToShape } from './shrink-picture'
 
 /**
@@ -64,13 +65,13 @@ export const PICTURE_RULES: Record<string, PictureRule> = {
 export function saysType(types: string[]): string {
   const names = types.map((t) => (t.split('/')[1] ?? t).toUpperCase())
   // quicktime is what a browser calls a MOV file
-  return names.map((n) => (n === 'QUICKTIME' ? 'MOV' : n)).join(' or ')
+  return names.map((n) => (n === 'QUICKTIME' ? 'MOV' : n)).join(WORDS.picture.or)
 }
 
 /** Is this file one of the types the box takes? The answer is the line shown. */
 export function typeProblem(type: string, types: string[]): string | null {
   if (types.includes(type)) return null
-  return `This spot takes ${saysType(types)} files.`
+  return WORDS.picture.takesTypes(saysType(types))
 }
 
 /**
@@ -114,5 +115,5 @@ export function sizeProblem(
   const keep = ratio ? cutToShape(width, height, ratio) : { width, height }
   if (Math.min(keep.width, keep.height) >= rule.smallest) return null
   const want = wantedSize(rule, width, height)
-  return `Your picture is ${width}×${height}, too small. This spot needs at least ${want.width}×${want.height}. Pick a larger one.`
+  return WORDS.picture.tooSmall(width, height, want.width, want.height)
 }

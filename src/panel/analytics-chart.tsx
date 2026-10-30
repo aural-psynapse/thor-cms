@@ -1,8 +1,9 @@
 import { Area, AreaChart, Bar, BarChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
 import type { ByDay } from './lib/numbers'
+import { WORDS } from './words'
 
 function shortDay(date: string): string {
-  return new Date(`${date}T00:00:00Z`).toLocaleDateString('en-GB', {
+  return new Date(`${date}T00:00:00Z`).toLocaleDateString(WORDS.locale, {
     day: 'numeric',
     month: 'short',
     timeZone: 'UTC',
@@ -35,7 +36,7 @@ export function VisitsBars({ data }: ChartProps) {
         <XAxis dataKey='name' {...AXIS} interval='preserveStartEnd' minTickGap={24} />
         <YAxis {...AXIS} allowDecimals={false} />
         <Tooltip cursor={{ fill: 'transparent' }} contentStyle={TIP} />
-        <Bar name='Visits' dataKey='visits' fill='currentColor' radius={[4, 4, 0, 0]} className='fill-primary' />
+        <Bar name={WORDS.numbers.visits} dataKey='visits' fill='currentColor' radius={[4, 4, 0, 0]} className='fill-primary' />
       </BarChart>
     </ResponsiveContainer>
   )
@@ -51,7 +52,7 @@ export function VisitsAgainstPlays({ data }: ChartProps) {
         <YAxis {...AXIS} allowDecimals={false} />
         <Tooltip contentStyle={TIP} />
         <Area
-          name='Visits'
+          name={WORDS.numbers.visits}
           type='monotone'
           dataKey='visits'
           stroke='currentColor'
@@ -60,7 +61,7 @@ export function VisitsAgainstPlays({ data }: ChartProps) {
           fillOpacity={0.15}
         />
         <Area
-          name='Plays'
+          name={WORDS.numbers.plays}
           type='monotone'
           dataKey='plays'
           stroke='currentColor'

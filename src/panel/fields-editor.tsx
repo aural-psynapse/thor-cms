@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input'
 import { AskFirst } from './ask-first'
 import { FIELD_TYPES, type Content, type FieldType, type StoredSection } from './field-list'
 import { IconButton } from './icon-button'
+import { WORDS } from './words'
 import {
   addField,
   addSection,
@@ -93,11 +94,7 @@ export function FieldsEditor({ content, onChange }: FieldsEditorProps) {
     : undefined
 
   return (
-    <div className='mx-auto max-w-2xl space-y-4'>
-      <p className='text-muted-foreground text-sm'>
-        The sections of your site and the boxes in each. Changes show in the editor at once and
-        go on the site when you save.
-      </p>
+    <div className='max-w-2xl space-y-4'>
 
       {sections.map((section) => {
         const draft = newBox[section.id] ?? { label: '', type: 'text' as FieldType }
@@ -105,20 +102,20 @@ export function FieldsEditor({ content, onChange }: FieldsEditorProps) {
           <Card key={section.id} data-fields-section={section.id} className='gap-3 p-4'>
             <div className='flex items-center gap-2'>
               <Input
-                aria-label='Section name'
+                aria-label={WORDS.fields.sectionName}
                 value={section.label}
                 className='font-medium'
                 onChange={(event) => rename(section.id, null, event.target.value)}
               />
               {!section.fixed && (
                 <>
-                  <IconButton label={`Move ${section.label} up`} onClick={() => setSections(nudgeSection(sections, section.id, -1))}>
+                  <IconButton label={WORDS.fields.moveUp(section.label)} onClick={() => setSections(nudgeSection(sections, section.id, -1))}>
                     <ArrowUp />
                   </IconButton>
-                  <IconButton label={`Move ${section.label} down`} onClick={() => setSections(nudgeSection(sections, section.id, 1))}>
+                  <IconButton label={WORDS.fields.moveDown(section.label)} onClick={() => setSections(nudgeSection(sections, section.id, 1))}>
                     <ArrowDown />
                   </IconButton>
-                  <IconButton label={`Remove ${section.label}`} onClick={() => setAsking({ section, key: null })}>
+                  <IconButton label={WORDS.fields.remove(section.label)} onClick={() => setAsking({ section, key: null })}>
                     <Trash2 />
                   </IconButton>
                 </>
@@ -128,23 +125,23 @@ export function FieldsEditor({ content, onChange }: FieldsEditorProps) {
             {section.fields.map((field) => (
               <div key={field.key} data-fields-box={field.key} className='flex flex-wrap items-center gap-2 ps-4'>
                 <Input
-                  aria-label='Box name'
+                  aria-label={WORDS.fields.boxName}
                   value={field.label}
                   className='min-w-40 flex-1'
                   onChange={(event) => rename(section.id, field.key, event.target.value)}
                 />
                 <TypePicker
-                  label={`Kind of box for ${field.label}`}
+                  label={WORDS.fields.kindOf(field.label)}
                   value={field.type}
                   onChange={(type) => onChange(retypeField(content, section.id, field.key, type))}
                 />
-                <IconButton label={`Move ${field.label} up`} onClick={() => setSections(nudgeField(sections, section.id, field.key, -1))}>
+                <IconButton label={WORDS.fields.moveUp(field.label)} onClick={() => setSections(nudgeField(sections, section.id, field.key, -1))}>
                   <ArrowUp />
                 </IconButton>
-                <IconButton label={`Move ${field.label} down`} onClick={() => setSections(nudgeField(sections, section.id, field.key, 1))}>
+                <IconButton label={WORDS.fields.moveDown(field.label)} onClick={() => setSections(nudgeField(sections, section.id, field.key, 1))}>
                   <ArrowDown />
                 </IconButton>
-                <IconButton label={`Remove ${field.label}`} onClick={() => setAsking({ section, key: field.key })}>
+                <IconButton label={WORDS.fields.remove(field.label)} onClick={() => setAsking({ section, key: field.key })}>
                   <Trash2 />
                 </IconButton>
               </div>
@@ -152,8 +149,8 @@ export function FieldsEditor({ content, onChange }: FieldsEditorProps) {
 
             <div className='flex flex-wrap items-center gap-2 ps-4'>
               <Input
-                aria-label={`New box in ${section.label}`}
-                placeholder='New box'
+                aria-label={WORDS.fields.newBoxIn(section.label)}
+                placeholder={WORDS.fields.newBox}
                 value={draft.label}
                 className='min-w-40 flex-1'
                 onChange={(event) =>
@@ -161,7 +158,7 @@ export function FieldsEditor({ content, onChange }: FieldsEditorProps) {
                 }
               />
               <TypePicker
-                label={`Kind of new box in ${section.label}`}
+                label={WORDS.fields.kindOfNew(section.label)}
                 value={draft.type}
                 onChange={(type) => setNewBox({ ...newBox, [section.id]: { ...draft, type } })}
               />
@@ -174,7 +171,7 @@ export function FieldsEditor({ content, onChange }: FieldsEditorProps) {
                   )
                 }
               >
-                <Plus /> Add box
+                <Plus /> {WORDS.fields.addBox}
               </Button>
             </div>
             {problem?.where === section.id && (
@@ -187,8 +184,8 @@ export function FieldsEditor({ content, onChange }: FieldsEditorProps) {
       <Card className='gap-2 p-4'>
         <div className='flex items-center gap-2'>
           <Input
-            aria-label='New section name'
-            placeholder='New section'
+            aria-label={WORDS.fields.newSectionName}
+            placeholder={WORDS.fields.newSection}
             value={newSection}
             onChange={(event) => setNewSection(event.target.value)}
           />
@@ -197,7 +194,7 @@ export function FieldsEditor({ content, onChange }: FieldsEditorProps) {
             variant='outline'
             onClick={() => take('new', addSection(sections, newSection), () => setNewSection(''))}
           >
-            <Plus /> Add section
+            <Plus /> {WORDS.fields.addSection}
           </Button>
         </div>
         {problem?.where === 'new' && <p className='text-destructive text-sm'>{problem.text}</p>}
@@ -206,8 +203,8 @@ export function FieldsEditor({ content, onChange }: FieldsEditorProps) {
       <AskFirst
         open={asking !== null}
         onOpenChange={(open) => !open && setAsking(null)}
-        title={`Remove ${askingField?.label ?? asking?.section.label ?? ''}?`}
-        action='Remove'
+        title={WORDS.fields.removeTitle(askingField?.label ?? asking?.section.label ?? '')}
+        action={WORDS.ask.remove}
         onConfirm={() => {
           if (asking) {
             onChange(
@@ -220,8 +217,8 @@ export function FieldsEditor({ content, onChange }: FieldsEditorProps) {
         }}
       >
         {asking?.key === null
-          ? 'The section and everything in it come off the site when you save.'
-          : 'The box and what is in it come off the site when you save.'}
+          ? WORDS.fields.removeSectionBody
+          : WORDS.fields.removeBoxBody}
       </AskFirst>
     </div>
   )

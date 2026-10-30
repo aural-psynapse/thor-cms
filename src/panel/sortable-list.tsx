@@ -18,6 +18,7 @@ import {
 import { CSS } from '@dnd-kit/utilities'
 import { GripVertical } from 'lucide-react'
 import { IconButton } from './icon-button'
+import { WORDS } from './words'
 
 /** What one row needs to be dragged: its box, its style, and the handle. */
 export type SortableRow = {
@@ -53,7 +54,7 @@ function Row<T extends { id: string }>({
     isDragging,
     handle: (
       <IconButton
-        label='Drag to reorder'
+        label={WORDS.sections.drag}
         className='cursor-grab touch-none active:cursor-grabbing'
         onClick={(event) => event.stopPropagation()}
         {...attributes}

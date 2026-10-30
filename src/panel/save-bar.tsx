@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import { AskFirst } from './ask-first'
 import { GREEN } from './icon-button'
+import { WORDS } from './words'
 
 /** How far a save has got, from the press of Save to the live site. */
 export type SaveStage =
@@ -28,13 +29,13 @@ export type SaveBarProps = {
 function said(stage: SaveStage): string {
   switch (stage.name) {
     case 'sending':
-      return `Sending the video, ${Math.round(stage.done * 100)}%`
+      return WORDS.save.sendingVideo(Math.round(stage.done * 100))
     case 'saving':
-      return 'Saving…'
+      return WORDS.save.saving
     case 'waiting':
-      return 'Saved. Putting it on the site…'
+      return WORDS.save.waiting
     case 'live':
-      return 'Your change is on the live site.'
+      return WORDS.save.live
     default:
       return ''
   }
@@ -64,7 +65,7 @@ export function SaveBar({ dirty, stage, problem, onSave, onCancel }: SaveBarProp
           {stage.name === 'sending' && !red && (
             <span
               role='progressbar'
-              aria-label='Sending the video'
+              aria-label={WORDS.save.sendingVideoBar}
               aria-valuenow={Math.round(stage.done * 100)}
               className='bg-muted mt-1 block h-1.5 w-48 max-w-full overflow-hidden rounded-full'
             >
@@ -80,20 +81,20 @@ export function SaveBar({ dirty, stage, problem, onSave, onCancel }: SaveBarProp
           <>
             <Button
               type='button'
-              variant='outline'
+              variant='destructive'
               disabled={busy}
               onClick={() => setAsking(true)}
             >
-              Cancel
+              {WORDS.save.cancel}
             </Button>
             <AskFirst
               open={asking}
               onOpenChange={setAsking}
-              title='Throw away your changes?'
-              action='Throw away'
+              title={WORDS.save.cancelTitle}
+              action={WORDS.save.cancelAction}
               onConfirm={onCancel}
             >
-              Everything goes back to how it was when you last saved.
+              {WORDS.save.cancelBody}
             </AskFirst>
 
             <Button
@@ -103,7 +104,7 @@ export function SaveBar({ dirty, stage, problem, onSave, onCancel }: SaveBarProp
               onClick={onSave}
             >
               {busy && <LoaderCircle className='size-4 animate-spin' />}
-              Save
+              {WORDS.save.save}
             </Button>
           </>
         )}

@@ -10,6 +10,7 @@ import { PictureRow } from './picture-row'
 import { VideoField } from './video-field'
 import type { FilesSlot } from './slots'
 import { TextFieldBox } from './text-field'
+import { WORDS } from './words'
 
 /** What every box needs from the panel around it. */
 export type FieldTools = {
@@ -121,9 +122,7 @@ export function FieldBox({ field, value, onChange, onLook, tools }: FieldBoxProp
             render({ value, onChange, disabled: tools.disabled })
           ) : (
             // A custom box added on the Fields page has no code behind it yet.
-            <p className='text-muted-foreground text-sm'>
-              This box needs code from whoever set up your site.
-            </p>
+            <p className='text-muted-foreground text-sm'>{WORDS.sections.needsCode}</p>
           )}
         </Card>
       )

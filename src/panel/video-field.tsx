@@ -12,6 +12,7 @@ import {
   type VideoRule,
 } from './lib/video-check'
 import { Thumb } from './thumb'
+import { WORDS } from './words'
 
 /** One place on the site where a video goes. */
 export type VideoFieldProps = {
@@ -94,7 +95,7 @@ export function VideoField({
 
         {!refused && !filled && (
           <span className='text-muted-foreground block text-xs whitespace-pre-line'>
-            {`${saysType(rule.types)}, up to ${rule.biggestMb} MB\n${saysShapes(rule)}`}
+            {WORDS.video.takes(saysType(rule.types), rule.biggestMb, saysShapes(rule))}
           </span>
         )}
 
@@ -102,13 +103,13 @@ export function VideoField({
             up as before, which reads as nothing having happened. */}
         {has && pickedName === undefined && (
           <span className='text-muted-foreground block text-xs'>
-            A video is on this box. Replace swaps it.
+            {WORDS.video.onBox}
           </span>
         )}
 
         {pickedName !== undefined && (
           <span className='text-muted-foreground block truncate text-xs'>
-            {`${pickedName}, goes up when you save`}
+            {WORDS.video.goesUp(pickedName)}
           </span>
         )}
       </span>
@@ -127,7 +128,7 @@ export function VideoField({
 
       <IconButton
         // Replacing throws the old video off this box, so it is red.
-        label={filled ? `Replace ${label.toLowerCase()}` : `Upload ${label.toLowerCase()}`}
+        label={filled ? WORDS.picture.replace(label) : WORDS.picture.upload(label)}
         tone={filled ? 'stop' : 'quiet'}
         disabled={disabled}
         onClick={(event) => {

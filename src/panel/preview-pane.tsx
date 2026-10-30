@@ -3,14 +3,15 @@ import { Maximize2, Monitor, Smartphone, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import type { PreviewSlot, PreviewUpdate } from './slots'
+import { WORDS } from './words'
 
 /** A screen the site is checked against. */
 export type Screen = { name: string; width: number; height: number }
 
 /** A phone held upright, the size most visitors arrive on. */
-export const PHONE: Screen = { name: 'Phone', width: 390, height: 844 }
+export const PHONE: Screen = { name: WORDS.preview.phone, width: 390, height: 844 }
 /** A laptop screen, a wide 16 to 9 window. */
-export const LAPTOP: Screen = { name: 'Laptop', width: 1440, height: 810 }
+export const LAPTOP: Screen = { name: WORDS.preview.laptop, width: 1440, height: 810 }
 
 /**
  * How much to shrink a screen so it fits the room, with a little margin. One
@@ -121,7 +122,7 @@ export function PreviewPane({ url, update, push, full, onFull, className }: Prev
           <iframe
             ref={frame}
             src={url}
-            title='Your site'
+            title={WORDS.preview.frameTitle}
             onLoad={send}
             className='h-full w-full border-0'
           />
@@ -134,8 +135,8 @@ export function PreviewPane({ url, update, push, full, onFull, className }: Prev
           type='button'
           variant={onPhone ? 'default' : 'ghost'}
           size='icon'
-          aria-label='Show it phone size'
-          title='Show it phone size'
+          aria-label={WORDS.preview.phoneSize}
+          title={WORDS.preview.phoneSize}
           onClick={() => setOnPhone(true)}
         >
           <Smartphone />
@@ -144,8 +145,8 @@ export function PreviewPane({ url, update, push, full, onFull, className }: Prev
           type='button'
           variant={onPhone ? 'ghost' : 'default'}
           size='icon'
-          aria-label='Show it laptop size'
-          title='Show it laptop size'
+          aria-label={WORDS.preview.laptopSize}
+          title={WORDS.preview.laptopSize}
           onClick={() => setOnPhone(false)}
         >
           <Monitor />
@@ -154,8 +155,8 @@ export function PreviewPane({ url, update, push, full, onFull, className }: Prev
           type='button'
           variant='ghost'
           size='icon'
-          aria-label={full ? 'Leave full screen' : 'Full screen'}
-          title={full ? 'Leave full screen' : 'Full screen'}
+          aria-label={full ? WORDS.preview.leaveFull : WORDS.preview.full}
+          title={full ? WORDS.preview.leaveFull : WORDS.preview.full}
           onClick={() => onFull(!full)}
         >
           {full ? <X /> : <Maximize2 />}

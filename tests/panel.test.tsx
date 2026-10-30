@@ -98,7 +98,7 @@ describe('editing and saving', () => {
     expect(content.isLive).toHaveBeenCalledTimes(3)
   })
 
-  it('Cancel asks first, then puts everything back', async () => {
+  it('Discard changes asks first, then puts everything back', async () => {
     const { slots, content } = recordingSlots({
       sections: [],
       values: { hero: { title: 'Before' } },
@@ -109,8 +109,8 @@ describe('editing and saving', () => {
     expect(box.value).toBe('Before')
     await user.clear(box)
     await user.type(box, 'After')
-    await user.click(screen.getByRole('button', { name: 'Cancel' }))
-    await user.click(await screen.findByRole('button', { name: 'Throw away' }))
+    await user.click(screen.getByRole('button', { name: 'Discard changes' }))
+    await user.click(await screen.findByRole('button', { name: 'Discard' }))
     expect((screen.getByLabelText('Heading') as HTMLInputElement).value).toBe('Before')
     expect(content.save).not.toHaveBeenCalled()
     expect(screen.queryByRole('button', { name: 'Save' })).toBeNull()

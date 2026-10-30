@@ -2,6 +2,7 @@ import { ArrowLeft } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import type { JsonValue, StoredSection } from './field-list'
 import { FieldBox, type FieldTools } from './field-box'
+import { WORDS } from './words'
 
 /** One opened section: its boxes and their values. */
 export type SectionEditorProps = {
@@ -26,15 +27,18 @@ export function SectionEditor({
 }: SectionEditorProps) {
   return (
     <div className='space-y-3'>
-      <div className='flex items-center gap-2'>
-        <Button type='button' variant='ghost' size='sm' onClick={onBack}>
-          <ArrowLeft /> All sections
+      {/* The way back and the heading stay in sight while the boxes under
+          them scroll. */}
+      <div className='bg-background sticky top-0 z-20 space-y-2 pb-2'>
+        <Button type='button' variant='ghost' className='-ms-2 h-8 gap-2 px-2' onClick={onBack}>
+          <ArrowLeft className='size-4' />
+          {WORDS.sections.allSections}
         </Button>
+        <h2 className='px-1 text-sm font-medium'>{section.label}</h2>
       </div>
-      <h2 className='px-1 text-lg font-semibold'>{section.label}</h2>
 
       {section.fields.length === 0 && (
-        <p className='text-muted-foreground px-1 text-sm'>Nothing to change here yet.</p>
+        <p className='text-muted-foreground px-1 text-sm'>{WORDS.sections.nothingHere}</p>
       )}
 
       {section.fields.map((field) => (

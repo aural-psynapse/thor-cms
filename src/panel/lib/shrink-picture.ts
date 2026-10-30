@@ -3,6 +3,8 @@
 // a site never shows one larger than this, so her own browser does the work
 // and the upload takes seconds instead of minutes.
 
+import { WORDS } from '../words'
+
 /** The longest side a picture on a site ever needs. */
 export const BIGGEST = 2000
 /** How hard webp squeezes: high enough that nobody sees the difference. */
@@ -111,7 +113,7 @@ export async function shrinkPicture(
   canvas.width = size.width
   canvas.height = size.height
   const paint = canvas.getContext('2d')
-  if (!paint) throw new Error('This browser cannot shrink pictures.')
+  if (!paint) throw new Error(WORDS.picture.cannotShrink)
   // Only the kept piece is drawn. It and the canvas have the same shape, so
   // this scales and never squashes.
   paint.drawImage(
@@ -130,6 +132,6 @@ export async function shrinkPicture(
   const body = await new Promise<Blob | null>((done) =>
     canvas.toBlob(done, 'image/webp', QUALITY),
   )
-  if (!body) throw new Error('The picture could not be read.')
+  if (!body) throw new Error(WORDS.picture.unreadable)
   return { body, width: size.width, height: size.height }
 }

@@ -13,6 +13,7 @@ import type { Item, ItemsValue } from './lib/values'
 import { MediaField } from './media-field'
 import type { FilesSlot } from './slots'
 import { SortableList } from './sortable-list'
+import { WORDS } from './words'
 
 /** The items of one folder. */
 export type ItemListProps = {
@@ -53,15 +54,16 @@ export function ItemList({
 
   return (
     <div className='space-y-2'>
-      <div className='flex items-center gap-2'>
-        <Button type='button' variant='ghost' size='sm' onClick={onBack}>
-          <ArrowLeft /> All folders
+      <div className='space-y-2'>
+        <Button type='button' variant='ghost' className='-ms-2 h-8 gap-2 px-2' onClick={onBack}>
+          <ArrowLeft className='size-4' />
+          {WORDS.items.allFolders}
         </Button>
-        <span className='text-sm font-medium'>{folder?.name ?? 'Not in any folder'}</span>
+        <h3 className='px-1 text-sm font-medium'>{folder?.name ?? WORDS.items.notInFolder}</h3>
       </div>
 
       {shown.length === 0 && (
-        <p className='text-muted-foreground px-1 text-sm'>Nothing in here yet.</p>
+        <p className='text-muted-foreground px-1 text-sm'>{WORDS.items.nothingInHere}</p>
       )}
 
       <SortableList
@@ -79,7 +81,7 @@ export function ItemList({
             <div className='flex items-center gap-2'>
               {row.handle}
               <select
-                aria-label={`Move ${item.name || 'this item'} to`}
+                aria-label={WORDS.items.moveTo(item.name || WORDS.items.thisItem)}
                 className='border-input bg-background h-8 min-w-0 flex-1 rounded-md border px-2 text-sm'
                 value={item.collection ?? ''}
                 disabled={disabled}
@@ -92,13 +94,13 @@ export function ItemList({
               >
                 {value.collections.map((c) => (
                   <option key={c.id} value={c.id}>
-                    {`In ${c.name}`}
+                    {WORDS.items.inFolder(c.name)}
                   </option>
                 ))}
-                <option value=''>In no folder, off the site</option>
+                <option value=''>{WORDS.items.inNoFolder}</option>
               </select>
               <IconButton
-                label={`Remove ${item.name || 'this item'}`}
+                label={WORDS.items.remove(item.name || WORDS.items.thisItem)}
                 disabled={disabled}
                 onClick={() => setAsking(item)}
               >
@@ -107,7 +109,7 @@ export function ItemList({
             </div>
 
             <div className='space-y-1'>
-              <Label htmlFor={`${item.id}-name`}>Name</Label>
+              <Label htmlFor={`${item.id}-name`}>{WORDS.items.name}</Label>
               <Input
                 id={`${item.id}-name`}
                 value={item.name}
@@ -117,7 +119,7 @@ export function ItemList({
               />
             </div>
             <div className='space-y-1'>
-              <Label htmlFor={`${item.id}-tag`}>Tag</Label>
+              <Label htmlFor={`${item.id}-tag`}>{WORDS.items.tag}</Label>
               <Input
                 id={`${item.id}-tag`}
                 value={item.tag}
@@ -127,7 +129,7 @@ export function ItemList({
               />
             </div>
             <MediaField
-              label={`Picture of ${item.name || 'this item'}`}
+              label={WORDS.items.pictureOf(item.name || WORDS.items.thisItem)}
               rule={rule}
               url={item.picture}
               upload={upload}
@@ -142,14 +144,14 @@ export function ItemList({
       <AskFirst
         open={asking !== null}
         onOpenChange={(open) => !open && setAsking(null)}
-        title={`Remove ${asking?.name || 'this item'}?`}
-        action='Remove'
+        title={WORDS.items.removeTitle(asking?.name || WORDS.items.thisItem)}
+        action={WORDS.ask.remove}
         onConfirm={() => {
           if (asking) onChange({ ...value, items: value.items.filter((i) => i.id !== asking.id) })
           setAsking(null)
         }}
       >
-        It comes off the site when you save.
+        {WORDS.ask.comesOff}
       </AskFirst>
 
       <Button
@@ -159,7 +161,7 @@ export function ItemList({
         disabled={disabled}
         onClick={() => onChange(addItem(value, collection))}
       >
-        <Plus className='size-4' /> Add an item
+        <Plus className='size-4' /> {WORDS.items.add}
       </Button>
     </div>
   )

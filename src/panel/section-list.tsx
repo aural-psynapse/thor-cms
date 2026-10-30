@@ -6,6 +6,7 @@ import { cn } from '@/lib/utils'
 import type { StoredSection } from './field-list'
 import { moveSection } from './lib/section-order'
 import { SortableList } from './sortable-list'
+import { WORDS } from './words'
 
 /** The sections of the page, and what happens when one is dragged, switched or opened. */
 export type SectionListProps = {
@@ -42,7 +43,9 @@ export function SectionList({ sections, onChange, onOpen }: SectionListProps) {
             section.locked ? 'cursor-default' : 'cursor-pointer',
           )}
         >
-          {row.handle}
+          {/* The top bar and the bottom of the page stay where they are, so
+              there is nothing to grab. The space keeps every card lined up. */}
+          {section.fixed ? <span className='size-8 shrink-0' /> : row.handle}
 
           <button
             type='button'
@@ -52,14 +55,14 @@ export function SectionList({ sections, onChange, onOpen }: SectionListProps) {
             {section.label}
             {section.hidden && (
               <span className='text-muted-foreground ms-2 text-xs font-normal'>
-                not on the site
+                {WORDS.sections.notOnSite}
               </span>
             )}
           </button>
 
           {section.fixed ? (
             // The top bar and the footer stay where they are and stay on.
-            <span className='text-muted-foreground text-xs'>always on</span>
+            <span className='text-muted-foreground text-xs'>{WORDS.sections.alwaysOn}</span>
           ) : (
             <Tooltip>
               {/* the switch keeps its own look; the span is only there to be hovered over */}
@@ -69,8 +72,8 @@ export function SectionList({ sections, onChange, onOpen }: SectionListProps) {
                     checked={!section.hidden}
                     aria-label={
                       section.hidden
-                        ? `Show ${section.label} on the site`
-                        : `Hide ${section.label} from the site`
+                        ? WORDS.sections.show(section.label)
+                        : WORDS.sections.hide(section.label)
                     }
                     onClick={(event) => event.stopPropagation()}
                     onCheckedChange={(on) => toggle(section.id, !on)}
@@ -78,7 +81,7 @@ export function SectionList({ sections, onChange, onOpen }: SectionListProps) {
                 </span>
               </TooltipTrigger>
               <TooltipContent>
-                {section.hidden ? 'Show this section' : 'Hide this section'}
+                {section.hidden ? WORDS.sections.showTip : WORDS.sections.hideTip}
               </TooltipContent>
             </Tooltip>
           )}

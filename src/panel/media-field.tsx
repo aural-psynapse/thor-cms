@@ -16,6 +16,7 @@ import { MIDDLE, measurePicture, shrinkPicture, type Framing } from './lib/shrin
 import { PlacePicture } from './place-picture'
 import type { FilesSlot } from './slots'
 import { Thumb } from './thumb'
+import { WORDS } from './words'
 
 /** How far a picture has got on its way to the site. */
 type Stage =
@@ -42,14 +43,14 @@ export type MediaFieldProps = {
 export function saysRule(rule: PictureRule): string {
   const types = saysType(rule.types)
   if (rule.shape.kind === 'any') {
-    return `${types}, at least ${rule.smallest} across the short side`
+    return WORDS.picture.takesAnyShape(types, rule.smallest)
   }
   const wide = wantedSize(rule, 16, 9)
   const size =
     rule.shape.kind === 'upright-or-wide'
-      ? `${wide.height}×${wide.width} upright or ${wide.width}×${wide.height} wide`
+      ? WORDS.picture.uprightOrWide(wide.width, wide.height)
       : `${wide.width}×${wide.height}`
-  return `${types}, at least ${size}\nAny shape, you pick what shows`
+  return WORDS.picture.takes(types, size)
 }
 
 /**
@@ -79,7 +80,7 @@ export function MediaField({
     // a new file clears whatever was wrong with the last one
     setStage({ name: 'resting' })
     if (!file.type.startsWith('image/')) {
-      setStage({ name: 'stuck', problem: 'That file is not a picture.' })
+      setStage({ name: 'stuck', problem: WORDS.picture.notAPicture })
       return
     }
     const wrongType = typeProblem(file.type, rule.types)
@@ -89,7 +90,7 @@ export function MediaField({
     }
     const size = await measurePicture(file)
     if (!size) {
-      setStage({ name: 'stuck', problem: 'That picture could not be read.' })
+      setStage({ name: 'stuck', problem: WORDS.picture.unreadable })
       return
     }
     const tooSmall = sizeProblem(size.width, size.height, rule)
@@ -119,7 +120,7 @@ export function MediaField({
       onChange(address)
       setStage({ name: 'resting' })
     } catch (error) {
-      setStage({ name: 'stuck', problem: `The picture did not go up: ${String(error)}` })
+      setStage({ name: 'stuck', problem: WORDS.picture.didNotGoUp(String(error)) })
     }
   }
 
@@ -172,14 +173,14 @@ export function MediaField({
             {stage.name === 'shrinking' && (
               <span className='text-muted-foreground flex items-center gap-2 text-xs'>
                 <LoaderCircle className='size-3 animate-spin' />
-                Making the photo smaller
+                {WORDS.picture.shrinking}
               </span>
             )}
 
             {stage.name === 'sending' && (
               <span className='mt-1 block space-y-1'>
                 <span className='text-muted-foreground block text-xs'>
-                  {`Sending, ${Math.round(stage.done * 100)}%`}
+                  {WORDS.picture.sending(Math.round(stage.done * 100))}
                 </span>
                 <Progress value={Math.round(stage.done * 100)} className='h-1.5' />
               </span>
@@ -206,7 +207,7 @@ export function MediaField({
 
           <IconButton
             // Replacing throws the old picture off this box, so it is red.
-            label={has ? `Replace ${label.toLowerCase()}` : `Upload ${label.toLowerCase()}`}
+            label={has ? WORDS.picture.replace(label) : WORDS.picture.upload(label)}
             tone={has ? 'stop' : 'quiet'}
             disabled={busy || disabled}
             onClick={(event) => {

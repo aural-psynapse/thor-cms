@@ -17,7 +17,10 @@ export const WORDS = {
       blurb: 'Change the site one section at a time. Drag to reorder, switch off what you do not want.',
     },
     numbers: { name: 'Numbers', blurb: 'How many people came to the site, and what they did there.' },
-    fields: { name: 'Fields', blurb: 'Which boxes each section has. Add, rename or remove them.' },
+    fields: {
+      name: 'Fields',
+      blurb: 'The sections of your site and the boxes in each. Changes show in the editor at once and go on the site when you save.',
+    },
   },
 
   menu: {
@@ -31,6 +34,9 @@ export const WORDS = {
     dark: 'Dark',
     system: 'Same as my computer',
     backToSite: 'Back to the site',
+    menuTitle: 'Menu',
+    menuBlurb: 'The pages of the admin panel.',
+    toggle: 'Narrow or widen the menu',
   },
 
   loading: 'Loading your site…',
@@ -133,6 +139,10 @@ export const WORDS = {
     name: 'Name',
     tag: 'Tag',
     pictureOf: (name: string) => `Picture of ${name}`,
+    notInFolder: 'Not in any folder',
+    count: (n: number) => (n === 1 ? '1 item' : `${n} items`),
+    nothingInHere: 'Nothing in here yet.',
+    add: 'Add an item',
   },
 
   folders: {
@@ -148,6 +158,7 @@ export const WORDS = {
     newName: 'Name of the new folder',
     add: 'Add this folder',
     dontAdd: 'Do not add a folder',
+    addFolder: 'Add a folder',
   },
 
   links: {
@@ -157,9 +168,20 @@ export const WORDS = {
     text: 'What the page shows',
     url: 'Where it goes',
     notALink: 'A link starts with https://',
+    add: 'Add a link',
   },
 
   fields: {
+    types: {
+      text: 'Short text',
+      longText: 'Long text',
+      picture: 'Picture',
+      pictures: 'Row of pictures',
+      video: 'Video',
+      items: 'List of items',
+      links: 'List of links',
+      custom: 'Custom',
+    },
     sectionName: 'Section name',
     boxName: 'Box name',
     moveUp: (name: string) => `Move ${name} up`,
@@ -193,6 +215,8 @@ export const WORDS = {
     days: (n: number) => `${n} days`,
     readAt: (time: string) => `Read at ${time}`,
     checkAgain: 'Check again',
+    nothingYet: 'Nothing yet.',
+    readFailed: (why: string) => `The numbers could not be read: ${why}`,
     off: 'Counting is not switched on for this site yet.',
     ofVisits: (percent: number) => `${percent}% of visits`,
     visits: 'Visits',

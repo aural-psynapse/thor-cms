@@ -1,6 +1,6 @@
 import { Suspense, lazy, useEffect, useMemo, useState } from 'react'
 import { Eye, LoaderCircle } from 'lucide-react'
-import { Button } from '@/components/ui/button'
+import { SidebarInset, SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar'
 import { TooltipProvider } from '@/components/ui/tooltip'
 import { cn } from '@/lib/utils'
 import type { NumbersState } from './analytics-board'
@@ -22,6 +22,8 @@ import { SectionEditor } from './section-editor'
 import { SectionList } from './section-list'
 import { IconButton } from './icon-button'
 import { PreviewPane } from './preview-pane'
+import { PAGES, PanelMenu, type Page } from './panel-menu'
+import { WORDS } from './words'
 import type { PreviewFocus, PreviewUpdate, Slots } from './slots'
 
 // The charts are most of the panel's weight, so they load only when the
@@ -30,15 +32,6 @@ const AnalyticsBoard = lazy(() =>
   import('./analytics-board').then((board) => ({ default: board.AnalyticsBoard })),
 )
 
-/** The panel's pages. */
-export type Page = 'edit' | 'numbers' | 'fields'
-
-const PAGES: { page: Page; name: string }[] = [
-  { page: 'edit', name: 'Edit' },
-  { page: 'numbers', name: 'Numbers' },
-  { page: 'fields', name: 'Fields' },
-]
-
 /** How often to ask whether a save is live, and when to give up. */
 export type LiveCheck = Pick<WaitParts, 'everyMs' | 'giveUpAfter' | 'pause'>
 
@@ -46,8 +39,10 @@ export type LiveCheck = Pick<WaitParts, 'everyMs' | 'giveUpAfter' | 'pause'>
 export type PanelProps = {
   fields: FieldList
   slots: Slots
-  /** The name at the top. */
+  /** The name at the top of the menu. */
   title?: string
+  /** Where the menu's "Back to the site" button goes. */
+  siteUrl?: string
   liveCheck?: LiveCheck
 }
 
@@ -56,7 +51,7 @@ export type PanelProps = {
  * draft beside what was last saved, and only calls the content code when she
  * presses Save.
  */
-export function Panel({ fields, slots, title = 'Your site', liveCheck }: PanelProps) {
+export function Panel({ fields, slots, title = WORDS.yourSite, siteUrl = '/', liveCheck }: PanelProps) {
   const [saved, setSaved] = useState<Content | null>(null)
   const [draft, setDraft] = useState<Content | null>(null)
   const [loadProblem, setLoadProblem] = useState<string | null>(null)
@@ -86,7 +81,7 @@ export function Panel({ fields, slots, title = 'Your site', liveCheck }: PanelPr
         setDraft(start)
       })
       .catch((error: unknown) => {
-        if (!gone) setLoadProblem(`Your content could not be loaded: ${String(error)}`)
+        if (!gone) setLoadProblem(WORDS.loadFailed(String(error)))
       })
     return () => {
       gone = true
@@ -118,7 +113,7 @@ export function Panel({ fields, slots, title = 'Your site', liveCheck }: PanelPr
   if (!draft || !saved) {
     return (
       <p className='text-muted-foreground flex items-center gap-2 p-6 text-sm'>
-        <LoaderCircle className='size-4 animate-spin' /> Loading your site…
+        <LoaderCircle className='size-4 animate-spin' /> {WORDS.loading}
       </p>
     )
   }
@@ -183,7 +178,7 @@ export function Panel({ fields, slots, title = 'Your site', liveCheck }: PanelPr
     } catch (error) {
       setStage({
         name: 'stuck',
-        problem: `Nothing was saved: the video did not go up. ${String(error)}`,
+        problem: WORDS.save.videoFailed(String(error)),
       })
       return
     }
@@ -192,7 +187,7 @@ export function Panel({ fields, slots, title = 'Your site', liveCheck }: PanelPr
     try {
       version = (await slots.content.save(sending)).version
     } catch (error) {
-      setStage({ name: 'stuck', problem: `Nothing was saved: ${String(error)}` })
+      setStage({ name: 'stuck', problem: WORDS.save.failed(String(error)) })
       return
     }
     setSaved(sending)
@@ -208,8 +203,7 @@ export function Panel({ fields, slots, title = 'Your site', liveCheck }: PanelPr
         ? { name: 'live' }
         : {
             name: 'stuck',
-            problem:
-              'Your change is saved, but the site is taking longer than usual to update. Check back in a few minutes.',
+            problem: WORDS.save.slow,
           },
     )
   }
@@ -233,93 +227,96 @@ export function Panel({ fields, slots, title = 'Your site', liveCheck }: PanelPr
     holdVideo,
   }
 
+  const here = PAGES.find((p) => p.page === page) ?? PAGES[0]
+
   return (
     <TooltipProvider>
-      <div className='flex h-svh flex-col'>
-        <header className='flex items-center gap-2 border-b px-4 py-2'>
-          <h1 className='text-base font-semibold'>{title}</h1>
-          <nav className='me-auto flex gap-1'>
-            {PAGES.map((one) => (
-              <Button
-                key={one.page}
-                type='button'
-                size='sm'
-                variant={page === one.page ? 'secondary' : 'ghost'}
-                aria-current={page === one.page ? 'page' : undefined}
-                onClick={() => setPage(one.page)}
-              >
-                {one.name}
-              </Button>
-            ))}
-          </nav>
-          {/* On a phone there is no room beside the boxes, so the preview
-              opens over the whole screen instead. */}
-          <IconButton
-            label='Show the preview'
-            className={cn('lg:hidden', page !== 'edit' && 'hidden')}
-            onClick={() => setFullPreview(true)}
-          >
-            <Eye />
-          </IconButton>
-        </header>
+      <SidebarProvider>
+        <PanelMenu title={title} page={page} onPage={setPage} siteUrl={siteUrl} />
 
-        {page === 'numbers' && (
-          <main className='min-h-0 flex-1 overflow-y-auto p-4'>
-            <Suspense fallback={<LoaderCircle className='size-4 animate-spin' />}>
-              <AnalyticsBoard
-                days={days}
-                onDays={setDays}
-                state={numbers}
-                onRefresh={() => setAsked((n) => n + 1)}
-                sections={draft.sections}
-                links={allLinks(draft)}
-              />
-            </Suspense>
-          </main>
-        )}
-
-        {page === 'fields' && (
-          <main className='min-h-0 flex-1 overflow-y-auto p-4'>
-            <FieldsEditor content={draft} onChange={change} />
-          </main>
-        )}
-
-        <main className={cn('flex min-h-0 flex-1 gap-4 p-4', page !== 'edit' && 'hidden')}>
-          <div className='min-h-0 w-full overflow-y-auto lg:max-w-md'>
-            {section ? (
-              <SectionEditor
-                section={section}
-                values={draft.values[section.id] ?? {}}
-                onChange={(key, value) => setValue(section.id, key, value)}
-                onBack={() => setOpen(null)}
-                onLook={(key) => setFocus({ section: section.id, field: key })}
-                tools={tools}
-              />
-            ) : (
-              <SectionList
-                sections={draft.sections}
-                onChange={(sections) => change({ ...draft, sections })}
-                onOpen={openSection}
-              />
+        {/* Every page fills the screen: its columns scroll inside themselves,
+            and the save bar sits under them at the bottom. */}
+        <SidebarInset className='@container/content h-svh'>
+          {/* On a laptop the menu is always there, so there is no top bar. On
+              a phone the menu slides away and this slim bar brings it back. */}
+          <header className='flex h-14 shrink-0 items-center gap-3 px-4 md:hidden'>
+            <SidebarTrigger className='size-9' aria-label={WORDS.menu.openMenu} />
+            <span className='me-auto truncate text-sm font-bold'>{title}</span>
+            {/* There is no room beside the boxes, so the preview opens over
+                the whole screen instead. */}
+            {page === 'edit' && (
+              <IconButton label={WORDS.preview.show} onClick={() => setFullPreview(true)}>
+                <Eye />
+              </IconButton>
             )}
-          </div>
+          </header>
 
-          {update && (
-            <PreviewPane
-              url={slots.preview.url}
-              update={update}
-              push={slots.preview.push}
-              full={fullPreview}
-              onFull={setFullPreview}
-              className='hidden min-h-0 flex-1 lg:grid'
-            />
+          <main data-layout='fixed' className='flex min-h-0 grow flex-col gap-4 overflow-hidden px-4 pt-4'>
+            <div className='space-y-1'>
+              <h1 className='text-2xl font-semibold'>{here.name}</h1>
+              <p className='text-foreground text-sm'>{here.blurb}</p>
+            </div>
+
+            {page === 'numbers' && (
+              <div className='min-h-0 flex-1 overflow-y-auto pb-6'>
+                <Suspense fallback={<LoaderCircle className='size-4 animate-spin' />}>
+                  <AnalyticsBoard
+                    days={days}
+                    onDays={setDays}
+                    state={numbers}
+                    onRefresh={() => setAsked((n) => n + 1)}
+                    sections={draft.sections}
+                    links={allLinks(draft)}
+                  />
+                </Suspense>
+              </div>
+            )}
+
+            {page === 'fields' && (
+              <div className='min-h-0 flex-1 overflow-y-auto pb-6'>
+                <FieldsEditor content={draft} onChange={change} />
+              </div>
+            )}
+
+            <div className={cn('flex min-h-0 flex-1 gap-4', page !== 'edit' && 'hidden')}>
+              {/* Only this column scrolls. The site beside it stays put. */}
+              <div className='min-h-0 w-full shrink-0 overflow-y-auto pe-1 pb-2 lg:w-[460px]'>
+                {section ? (
+                  <SectionEditor
+                    section={section}
+                    values={draft.values[section.id] ?? {}}
+                    onChange={(key, value) => setValue(section.id, key, value)}
+                    onBack={() => setOpen(null)}
+                    onLook={(key) => setFocus({ section: section.id, field: key })}
+                    tools={tools}
+                  />
+                ) : (
+                  <SectionList
+                    sections={draft.sections}
+                    onChange={(sections) => change({ ...draft, sections })}
+                    onOpen={openSection}
+                  />
+                )}
+              </div>
+
+              {update && (
+                <PreviewPane
+                  url={slots.preview.url}
+                  update={update}
+                  push={slots.preview.push}
+                  full={fullPreview}
+                  onFull={setFullPreview}
+                  className='hidden min-h-0 flex-1 lg:grid'
+                />
+              )}
+            </div>
+          </main>
+
+          {(dirty || stage.name !== 'resting') && (
+            <SaveBar dirty={dirty} stage={stage} onSave={() => void save()} onCancel={cancel} />
           )}
-        </main>
-
-        {(dirty || stage.name !== 'resting') && (
-          <SaveBar dirty={dirty} stage={stage} onSave={() => void save()} onCancel={cancel} />
-        )}
-      </div>
+        </SidebarInset>
+      </SidebarProvider>
     </TooltipProvider>
   )
 }

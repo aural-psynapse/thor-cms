@@ -2,6 +2,8 @@
 // from. The numbers code fills this in from whatever counts visits for the
 // site; the Numbers page only draws it.
 
+import { WORDS } from '../words'
+
 /** One day's count. `date` is written 2026-09-18. */
 export type DayCount = { date: string; count: number }
 
@@ -77,7 +79,7 @@ export function countryName(code: string): string {
   const two = code.trim().toUpperCase()
   if (!/^[A-Z]{2}$/.test(two)) return code
   try {
-    return new Intl.DisplayNames(['en'], { type: 'region' }).of(two) ?? code
+    return new Intl.DisplayNames([WORDS.locale], { type: 'region' }).of(two) ?? code
   } catch {
     return code
   }

@@ -17,3 +17,15 @@ Element.prototype.hasPointerCapture ??= function hasPointerCapture(): boolean {
 }
 URL.createObjectURL ??= (): string => 'blob:picked'
 URL.revokeObjectURL ??= (): void => {}
+// a laptop-wide window that never matches a media query
+window.matchMedia ??= (query: string): MediaQueryList =>
+  ({
+    matches: false,
+    media: query,
+    onchange: null,
+    addEventListener() {},
+    removeEventListener() {},
+    addListener() {},
+    removeListener() {},
+    dispatchEvent: () => false,
+  }) as MediaQueryList

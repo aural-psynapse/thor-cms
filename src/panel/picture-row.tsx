@@ -6,6 +6,7 @@ import { IconButton } from './icon-button'
 import type { PictureRule } from './lib/picture-rules'
 import { MediaField } from './media-field'
 import type { FilesSlot } from './slots'
+import { WORDS } from './words'
 
 /** A row of pictures held to one rule. */
 export type PictureRowProps = {
@@ -40,7 +41,7 @@ export function PictureRow({
         <div key={at} className='flex items-center gap-2'>
           <div className='min-w-0 flex-1'>
             <MediaField
-              label={`Picture ${at + 1}`}
+              label={WORDS.picture.numbered(at + 1)}
               rule={rule}
               url={url}
               upload={upload}
@@ -50,7 +51,7 @@ export function PictureRow({
             />
           </div>
           <IconButton
-            label={`Remove picture ${at + 1}`}
+            label={WORDS.picture.removeNumbered(at + 1)}
             disabled={disabled}
             onClick={() => setAsking(at)}
           >
@@ -62,14 +63,14 @@ export function PictureRow({
       <AskFirst
         open={asking !== null}
         onOpenChange={(open) => !open && setAsking(null)}
-        title={`Remove picture ${(asking ?? 0) + 1}?`}
-        action='Remove'
+        title={WORDS.picture.removeNumberedTitle((asking ?? 0) + 1)}
+        action={WORDS.ask.remove}
         onConfirm={() => {
           onChange(urls.filter((_, i) => i !== asking))
           setAsking(null)
         }}
       >
-        It comes off the site when you save.
+        {WORDS.ask.comesOff}
       </AskFirst>
 
       <Button
@@ -79,7 +80,7 @@ export function PictureRow({
         disabled={disabled}
         onClick={() => onChange([...urls, ''])}
       >
-        <Plus className='size-4' /> Add a picture
+        <Plus className='size-4' /> {WORDS.picture.add}
       </Button>
     </div>
   )

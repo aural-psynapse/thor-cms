@@ -3,6 +3,7 @@ import { Check, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { GREEN } from './icon-button'
 import { MIDDLE, cutToShape, type Framing } from './lib/shrink-picture'
+import { WORDS } from './words'
 
 /** The step between picking a picture and sending it. */
 export type PlacePictureProps = {
@@ -90,7 +91,7 @@ export function PlacePicture({
   return (
     <div className='flex w-full flex-col gap-3'>
       <p className='text-sm font-medium'>
-        {canDrag ? `Drag ${label.toLowerCase()} to choose what shows` : label}
+        {canDrag ? WORDS.picture.dragToChoose(label) : label}
       </p>
 
       <div
@@ -119,15 +120,15 @@ export function PlacePicture({
       </div>
 
       <p className='text-muted-foreground text-xs'>
-        This box is the size the site draws it. Only what you can see here goes on the site.
+        {WORDS.picture.frameNote}
       </p>
 
       <div className='flex justify-end gap-2'>
         <Button type='button' variant='outline' onClick={onCancel}>
-          <X /> Cancel
+          <X /> {WORDS.picture.cancel}
         </Button>
         <Button type='button' className={GREEN} onClick={() => onKeep(at)}>
-          <Check /> Use this
+          <Check /> {WORDS.picture.useThis}
         </Button>
       </div>
     </div>

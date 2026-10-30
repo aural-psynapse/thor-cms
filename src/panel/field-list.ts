@@ -5,6 +5,7 @@
 import type { ReactNode } from 'react'
 import type { PictureRule } from './lib/picture-rules'
 import type { VideoRule } from './lib/video-check'
+import { WORDS } from './words'
 
 /** Anything that can be written as JSON. Every saved value is one of these. */
 export type JsonValue =
@@ -105,16 +106,9 @@ export type Content = {
 }
 
 /** The kinds of box in the order the Fields page offers them, with their names. */
-export const FIELD_TYPES: { type: FieldType; name: string }[] = [
-  { type: 'text', name: 'Short text' },
-  { type: 'longText', name: 'Long text' },
-  { type: 'picture', name: 'Picture' },
-  { type: 'pictures', name: 'Row of pictures' },
-  { type: 'video', name: 'Video' },
-  { type: 'items', name: 'List of items' },
-  { type: 'links', name: 'List of links' },
-  { type: 'custom', name: 'Custom' },
-]
+export const FIELD_TYPES: { type: FieldType; name: string }[] = (
+  ['text', 'longText', 'picture', 'pictures', 'video', 'items', 'links', 'custom'] as const
+).map((type) => ({ type, name: WORDS.fields.types[type] }))
 
 /** The field list without its render functions, ready to save as JSON. */
 export function toStored(list: FieldList): StoredSection[] {

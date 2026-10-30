@@ -27,6 +27,7 @@ import { IconButton } from './icon-button'
 import type { NamedLink } from './lib/links'
 import { asTime, countryName, flagOf, joinDays, total, type Numbers } from './lib/numbers'
 import { Thumb } from './thumb'
+import { WORDS } from './words'
 
 /** Where the numbers have got to. */
 export type NumbersState =
@@ -69,7 +70,7 @@ export function sectionMark(section: StoredSection | undefined): LucideIcon {
 }
 
 function share(part: number, all: number): string {
-  return all > 0 ? `${Math.round((part / all) * 100)}% of visits` : ''
+  return all > 0 ? WORDS.numbers.ofVisits(Math.round((part / all) * 100)) : ''
 }
 
 function Figure({ title, value, under, icon: Icon }: {
@@ -103,7 +104,7 @@ function Listing({ title, blurb, icon, rows }: { title: string; blurb: string; i
       </CardHeader>
       <CardContent>
         {rows.length === 0 ? (
-          <p className='text-muted-foreground text-sm'>Nothing yet.</p>
+          <p className='text-muted-foreground text-sm'>{WORDS.numbers.nothingYet}</p>
         ) : (
           <div className='space-y-4'>
             {rows.slice(0, 6).map((row) => (
@@ -152,15 +153,17 @@ export function AnalyticsBoard({ days, onDays, state, onRefresh, sections, links
           aria-pressed={period === days}
           onClick={() => onDays(period)}
         >
-          {`${period} days`}
+          {WORDS.numbers.days(period)}
         </Button>
       ))}
       <span className='text-muted-foreground ms-auto text-xs'>
         {state.name === 'ready'
-          ? `Read at ${new Date(state.at).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })}`
+          ? WORDS.numbers.readAt(
+              new Date(state.at).toLocaleTimeString(WORDS.locale, { hour: '2-digit', minute: '2-digit' }),
+            )
           : ''}
       </span>
-      <IconButton label='Check again' disabled={state.name === 'loading'} onClick={onRefresh}>
+      <IconButton label={WORDS.numbers.checkAgain} disabled={state.name === 'loading'} onClick={onRefresh}>
         <RefreshCw className={state.name === 'loading' ? 'animate-spin' : undefined} />
       </IconButton>
     </div>
@@ -184,7 +187,7 @@ export function AnalyticsBoard({ days, onDays, state, onRefresh, sections, links
     return (
       <div className='space-y-4'>
         {header}
-        <p className='text-destructive max-w-prose text-sm'>{`The numbers could not be read: ${state.problem}`}</p>
+        <p className='text-destructive max-w-prose text-sm'>{WORDS.numbers.readFailed(state.problem)}</p>
       </div>
     )
   }
@@ -195,7 +198,7 @@ export function AnalyticsBoard({ days, onDays, state, onRefresh, sections, links
       <div className='space-y-4'>
         {header}
         <p className='text-muted-foreground max-w-prose text-sm'>
-          Counting is not switched on for this site yet.
+          {WORDS.numbers.off}
         </p>
       </div>
     )
@@ -210,23 +213,23 @@ export function AnalyticsBoard({ days, onDays, state, onRefresh, sections, links
       {header}
 
       <div className='grid gap-4 sm:grid-cols-2 lg:grid-cols-4'>
-        <Figure title='Visits' value={String(visits)} under='People who opened the site' icon={Users} />
-        <Figure title='Plays' value={String(total(seen.plays))} under='Times a video was started' icon={Play} />
-        <Figure title='Time watched' value={asTime(seen.watched)} under='Everyone added together' icon={Timer} />
-        <Figure title='Watched through' value={`${seen.watchedThrough}%`} under='How far into a video people get' icon={Eye} />
+        <Figure title={WORDS.numbers.visits} value={String(visits)} under={WORDS.numbers.visitsUnder} icon={Users} />
+        <Figure title={WORDS.numbers.plays} value={String(total(seen.plays))} under={WORDS.numbers.playsUnder} icon={Play} />
+        <Figure title={WORDS.numbers.watched} value={asTime(seen.watched)} under={WORDS.numbers.watchedUnder} icon={Timer} />
+        <Figure title={WORDS.numbers.through} value={`${seen.watchedThrough}%`} under={WORDS.numbers.throughUnder} icon={Eye} />
       </div>
 
       <Tabs defaultValue='visits' className='gap-4'>
         <TabsList>
-          <TabsTrigger value='visits'>Visits by day</TabsTrigger>
-          <TabsTrigger value='both'>Visits against plays</TabsTrigger>
+          <TabsTrigger value='visits'>{WORDS.numbers.byDay}</TabsTrigger>
+          <TabsTrigger value='both'>{WORDS.numbers.against}</TabsTrigger>
         </TabsList>
         <TabsContent value='visits'>
           <div className='grid gap-4 lg:grid-cols-7'>
             <Card className='lg:col-span-4'>
               <CardHeader>
-                <CardTitle>Visits</CardTitle>
-                <CardDescription>{`${visits} in the last ${days} days`}</CardDescription>
+                <CardTitle>{WORDS.numbers.visits}</CardTitle>
+                <CardDescription>{WORDS.numbers.inLast(visits, days)}</CardDescription>
               </CardHeader>
               <CardContent className='ps-2'>
                 <VisitsBars data={byDay} />
@@ -234,14 +237,14 @@ export function AnalyticsBoard({ days, onDays, state, onRefresh, sections, links
             </Card>
             <div className='lg:col-span-3'>
               <Listing
-                title='Most watched'
-                blurb={watchedMost.length === 0 ? 'Nobody has pressed play yet.' : 'The videos people played most.'}
+                title={WORDS.numbers.mostWatched}
+                blurb={watchedMost.length === 0 ? WORDS.numbers.noPlays : WORDS.numbers.playedMost}
                 icon={Play}
                 rows={watchedMost.map((v) => ({
                   name: v.title,
                   poster: v.poster,
-                  under: `stays ${asTime(v.usualStay)} of ${asTime(v.length)}`,
-                  value: `${v.plays} plays`,
+                  under: WORDS.numbers.stays(asTime(v.usualStay), asTime(v.length)),
+                  value: WORDS.numbers.playsCount(v.plays),
                 }))}
               />
             </div>
@@ -250,8 +253,8 @@ export function AnalyticsBoard({ days, onDays, state, onRefresh, sections, links
         <TabsContent value='both'>
           <Card>
             <CardHeader>
-              <CardTitle>Visits against plays</CardTitle>
-              <CardDescription>How many came, and how many pressed play</CardDescription>
+              <CardTitle>{WORDS.numbers.against}</CardTitle>
+              <CardDescription>{WORDS.numbers.againstBlurb}</CardDescription>
             </CardHeader>
             <CardContent className='ps-2'>
               <VisitsAgainstPlays data={byDay} />
@@ -262,8 +265,8 @@ export function AnalyticsBoard({ days, onDays, state, onRefresh, sections, links
 
       <div className='grid gap-4 md:grid-cols-2'>
         <Listing
-          title='What they pressed'
-          blurb='The links on your site'
+          title={WORDS.numbers.pressed}
+          blurb={WORDS.numbers.pressedBlurb}
           icon={MousePointerClick}
           rows={seen.taps.map((tap) => {
             const link = links.find((l) => l.id === tap.link)
@@ -271,21 +274,21 @@ export function AnalyticsBoard({ days, onDays, state, onRefresh, sections, links
               name: link?.platformName ?? tap.link,
               brand: link && hasBrand(link.platform) ? link.platform : undefined,
               icon: Link2,
-              under: link?.text || (tap.count === 1 ? 'once' : `${tap.count} times`),
+              under: link?.text || WORDS.numbers.times(tap.count),
               value: String(tap.count),
             }
           })}
         />
         <Listing
-          title='Where they spend their time'
-          blurb='How long one visit lasts on each section'
+          title={WORDS.numbers.spend}
+          blurb={WORDS.numbers.spendBlurb}
           icon={Timer}
           rows={seen.stays.map((stay) => {
             const section = sections.find((s) => s.id === stay.section)
             return {
               name: section?.label ?? stay.section,
               icon: sectionMark(section),
-              under: `${stay.visits} ${stay.visits === 1 ? 'visit' : 'visits'}`,
+              under: WORDS.numbers.visitCount(stay.visits),
               value: asTime(stay.seconds / Math.max(stay.visits, 1)),
             }
           })}
@@ -294,14 +297,14 @@ export function AnalyticsBoard({ days, onDays, state, onRefresh, sections, links
 
       <div className='grid gap-4 md:grid-cols-2'>
         <Listing
-          title='Where they came from'
-          blurb='The page they were on before'
+          title={WORDS.numbers.from}
+          blurb={WORDS.numbers.fromBlurb}
           icon={Globe}
           rows={seen.sources.map((s) => ({ name: s.name, under: share(s.visits, visits), value: String(s.visits) }))}
         />
         <Listing
-          title='Which country'
-          blurb='Where they opened the site'
+          title={WORDS.numbers.country}
+          blurb={WORDS.numbers.countryBlurb}
           icon={MapPin}
           rows={seen.countries.map((c) => ({
             name: countryName(c.code),

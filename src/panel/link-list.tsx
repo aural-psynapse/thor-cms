@@ -13,6 +13,7 @@ import { linkProblem, platformLabel } from './lib/links'
 import { arrayMove } from './lib/section-order'
 import { newId, type Link } from './lib/values'
 import { SortableList } from './sortable-list'
+import { WORDS } from './words'
 
 /** A list of links, each with its platform. */
 export type LinkListProps = {
@@ -56,7 +57,7 @@ export function LinkList({ label, links, platforms, onChange, onLook, disabled =
                 {row.handle}
                 <BrandIcon platform={link.platform} className='size-5 shrink-0' />
                 <select
-                  aria-label={`Where ${name(link)} is`}
+                  aria-label={WORDS.links.where(name(link))}
                   className='border-input bg-background h-8 min-w-0 flex-1 rounded-md border px-2 text-sm'
                   value={link.platform}
                   disabled={disabled}
@@ -69,7 +70,7 @@ export function LinkList({ label, links, platforms, onChange, onLook, disabled =
                   ))}
                 </select>
                 <IconButton
-                  label={`Remove ${name(link)}`}
+                  label={WORDS.links.remove(name(link))}
                   disabled={disabled}
                   onClick={() => setAsking(link)}
                 >
@@ -78,7 +79,7 @@ export function LinkList({ label, links, platforms, onChange, onLook, disabled =
               </div>
 
               <div className='space-y-1'>
-                <Label htmlFor={`${link.id}-text`}>What the page shows</Label>
+                <Label htmlFor={`${link.id}-text`}>{WORDS.links.text}</Label>
                 <Input
                   id={`${link.id}-text`}
                   value={link.text}
@@ -88,7 +89,7 @@ export function LinkList({ label, links, platforms, onChange, onLook, disabled =
                 />
               </div>
               <div className='space-y-1'>
-                <Label htmlFor={`${link.id}-url`}>Where it goes</Label>
+                <Label htmlFor={`${link.id}-url`}>{WORDS.links.url}</Label>
                 <Input
                   id={`${link.id}-url`}
                   value={link.url}
@@ -108,14 +109,14 @@ export function LinkList({ label, links, platforms, onChange, onLook, disabled =
       <AskFirst
         open={asking !== null}
         onOpenChange={(open) => !open && setAsking(null)}
-        title={`Remove ${asking ? name(asking) : ''}?`}
-        action='Remove'
+        title={WORDS.links.removeTitle(asking ? name(asking) : '')}
+        action={WORDS.ask.remove}
         onConfirm={() => {
           if (asking) onChange(links.filter((l) => l.id !== asking.id))
           setAsking(null)
         }}
       >
-        It comes off the site when you save.
+        {WORDS.ask.comesOff}
       </AskFirst>
 
       <Button
@@ -131,7 +132,7 @@ export function LinkList({ label, links, platforms, onChange, onLook, disabled =
           ])
         }}
       >
-        <Plus className='size-4' /> Add a link
+        <Plus className='size-4' /> {WORDS.links.add}
       </Button>
     </div>
   )

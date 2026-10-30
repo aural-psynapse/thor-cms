@@ -1,6 +1,7 @@
 // Links the site points to: social accounts, a shop, anything with an address.
 
 import type { Content, Platform } from '../field-list'
+import { WORDS } from '../words'
 import { readLinks } from './values'
 
 /** The platforms a links box offers when the field list names none. */
@@ -21,7 +22,7 @@ export const DEFAULT_PLATFORMS: Platform[] = [
  * up with a dead one on it. Plain http:// is refused too: browsers warn on it.
  */
 export function linkProblem(url: string): string | null {
-  if (!/^https:\/\/[^\s/]+\.\S+$/i.test(url.trim())) return 'A link starts with https://'
+  if (!/^https:\/\/[^\s/]+\.\S+$/i.test(url.trim())) return WORDS.links.notALink
   return null
 }
 

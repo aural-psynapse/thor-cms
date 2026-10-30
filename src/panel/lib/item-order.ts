@@ -2,6 +2,7 @@
 // one array in page order; a folder's items are the ones that name it, in the
 // order they come in that array.
 
+import { WORDS } from '../words'
 import { arrayMove } from './section-order'
 import { newId, type Collection, type Item, type ItemsValue } from './values'
 
@@ -17,7 +18,7 @@ export function countIn(items: Item[], collection: string | null): number {
 
 /** "1 item", "3 items". */
 export function itemCount(n: number): string {
-  return n === 1 ? '1 item' : `${n} items`
+  return WORDS.items.count(n)
 }
 
 /**

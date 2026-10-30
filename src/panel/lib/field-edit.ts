@@ -7,22 +7,19 @@ import { SQUARE, WIDE } from './picture-rules'
 import { arrayMove, moveSection } from './section-order'
 import { newId } from './values'
 import { VIDEO } from './video-check'
+import { WORDS } from '../words'
 
 /** What is wrong with a field list, in one plain sentence, or nothing. */
 export function fieldListProblem(sections: StoredSection[]): string | null {
   const ids = new Set<string>()
   for (const section of sections) {
-    if (section.label.trim() === '') return 'Every section needs a name.'
-    if (ids.has(section.id)) {
-      return `Two sections are called "${section.id}". Give one of them another name.`
-    }
+    if (section.label.trim() === '') return WORDS.fields.sectionNeedsName
+    if (ids.has(section.id)) return WORDS.fields.twoSections(section.id)
     ids.add(section.id)
     const keys = new Set<string>()
     for (const field of section.fields) {
-      if (field.label.trim() === '') return `Every box in ${section.label} needs a name.`
-      if (keys.has(field.key)) {
-        return `Two boxes in ${section.label} are called "${field.key}". Give one of them another name.`
-      }
+      if (field.label.trim() === '') return WORDS.fields.boxNeedsName(section.label)
+      if (keys.has(field.key)) return WORDS.fields.twoBoxes(section.label, field.key)
       keys.add(field.key)
     }
   }
@@ -77,13 +74,13 @@ export function addField(
   type: FieldType,
 ): Added {
   const name = label.trim()
-  if (name === '') return { problem: 'Give the new box a name.' }
+  if (name === '') return { problem: WORDS.fields.nameNewBox }
   const section = sections.find((s) => s.id === sectionId)
-  if (!section) return { problem: 'That section is gone.' }
+  if (!section) return { problem: WORDS.fields.sectionGone }
   const key = newId(name, [])
   // the same key, or a box she already calls by that name
   if (section.fields.some((f) => f.key === key || sameName(f.label, name))) {
-    return { problem: `There is already a box called "${name}" in ${section.label}. Pick another name.` }
+    return { problem: WORDS.fields.boxTaken(name, section.label) }
   }
   return {
     sections: sections.map((s) =>
@@ -95,10 +92,10 @@ export function addField(
 /** Adds an empty section before the last fixed one, refusing a name already used. */
 export function addSection(sections: StoredSection[], label: string): Added {
   const name = label.trim()
-  if (name === '') return { problem: 'Give the new section a name.' }
+  if (name === '') return { problem: WORDS.fields.nameNewSection }
   const id = newId(name, [])
   if (sections.some((s) => s.id === id || sameName(s.label, name))) {
-    return { problem: `There is already a section called "${name}". Pick another name.` }
+    return { problem: WORDS.fields.sectionTaken(name) }
   }
   const fresh: StoredSection = { id, label: name, fields: [] }
   // A footer held at the bottom stays the last thing on the page.

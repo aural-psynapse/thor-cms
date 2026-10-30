@@ -11,6 +11,7 @@ import { addCollection, countIn, itemCount, removeCollection } from './lib/item-
 import { arrayMove } from './lib/section-order'
 import type { Collection, ItemsValue } from './lib/values'
 import { SortableList } from './sortable-list'
+import { WORDS } from './words'
 
 /** The folders of one list of items. */
 export type CollectionListProps = {
@@ -68,21 +69,21 @@ export function CollectionList({ value, onChange, onOpen, disabled = false }: Co
               <div className='flex items-center gap-2'>
                 {row.handle}
                 <span className='text-muted-foreground min-w-0 flex-1 truncate text-xs'>
-                  {count === 0 ? 'No items, so it is off the site' : itemCount(count)}
+                  {count === 0 ? WORDS.folders.empty : itemCount(count)}
                 </span>
                 <IconButton
-                  label={`Delete ${collection.name}`}
+                  label={WORDS.folders.delete(collection.name)}
                   disabled={disabled}
                   onClick={() => setAsking(collection)}
                 >
                   <Trash2 />
                 </IconButton>
-                <IconButton label='Open its items' onClick={() => onOpen(collection.id)}>
+                <IconButton label={WORDS.folders.open} onClick={() => onOpen(collection.id)}>
                   <ChevronRight />
                 </IconButton>
               </div>
               <div className='space-y-1'>
-                <Label htmlFor={`${collection.id}-name`}>Folder name</Label>
+                <Label htmlFor={`${collection.id}-name`}>{WORDS.folders.name}</Label>
                 <Input
                   id={`${collection.id}-name`}
                   value={collection.name}
@@ -98,16 +99,16 @@ export function CollectionList({ value, onChange, onOpen, disabled = false }: Co
       <AskFirst
         open={asking !== null}
         onOpenChange={(open) => !open && setAsking(null)}
-        title={`Delete ${asking?.name ?? ''}?`}
-        action='Delete'
+        title={WORDS.folders.deleteTitle(asking?.name ?? '')}
+        action={WORDS.ask.delete}
         onConfirm={() => {
           if (asking) onChange(removeCollection(value, asking.id))
           setAsking(null)
         }}
       >
         {askingCount === 0
-          ? 'It holds nothing, so only the heading goes.'
-          : `Its ${itemCount(askingCount)} are kept, but they come off the site until you put them in another folder.`}
+          ? WORDS.folders.deleteEmpty
+          : WORDS.folders.deleteFull(itemCount(askingCount))}
       </AskFirst>
 
       {/* Where the items of a deleted folder wait, so nothing gets lost. */}
@@ -118,9 +119,9 @@ export function CollectionList({ value, onChange, onOpen, disabled = false }: Co
         >
           <span className='size-8' />
           <span className='min-w-0 flex-1'>
-            <span className='block truncate text-sm font-medium'>Not in any folder</span>
+            <span className='block truncate text-sm font-medium'>{WORDS.items.notInFolder}</span>
             <span className='text-muted-foreground block text-xs'>
-              {`${itemCount(loose)}, not on the site`}
+              {WORDS.folders.loose(itemCount(loose))}
             </span>
           </span>
           <ChevronRight className='text-muted-foreground size-4' />
@@ -132,7 +133,7 @@ export function CollectionList({ value, onChange, onOpen, disabled = false }: Co
           <Input
             autoFocus
             value={newName}
-            aria-label='Name of the new folder'
+            aria-label={WORDS.folders.newName}
             className='h-8 flex-1'
             onChange={(event) => setNewName(event.target.value)}
             onKeyDown={(event) => {
@@ -143,10 +144,10 @@ export function CollectionList({ value, onChange, onOpen, disabled = false }: Co
               if (event.key === 'Escape') setAdding(false)
             }}
           />
-          <IconButton label='Add this folder' tone='go' onClick={add}>
+          <IconButton label={WORDS.folders.add} tone='go' onClick={add}>
             <Check />
           </IconButton>
-          <IconButton label='Do not add a folder' tone='quiet' onClick={() => setAdding(false)}>
+          <IconButton label={WORDS.folders.dontAdd} tone='quiet' onClick={() => setAdding(false)}>
             <X />
           </IconButton>
         </Card>
@@ -158,7 +159,7 @@ export function CollectionList({ value, onChange, onOpen, disabled = false }: Co
           disabled={disabled}
           onClick={() => setAdding(true)}
         >
-          <Plus className='size-4' /> Add a folder
+          <Plus className='size-4' /> {WORDS.folders.addFolder}
         </Button>
       )}
     </div>
