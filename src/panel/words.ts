@@ -14,12 +14,12 @@ export const WORDS = {
   pages: {
     edit: {
       name: 'Content',
-      blurb: 'Change the site one section at a time. Drag to reorder, switch off what you do not want.',
+      blurb: 'Texts and pictures in every section of the page. Changes show at once in the preview on the right.',
     },
     numbers: { name: 'Analytics', blurb: 'How many people came to the site, and what they did there.' },
     settings: {
       name: 'Settings',
-      blurb: 'What sits outside the page itself: how search engines show the site, contact details, and the like.',
+      blurb: 'What sits outside the page itself: how search engines show the site.',
     },
     fields: {
       name: 'Fields',
@@ -227,7 +227,7 @@ export const WORDS = {
     visits: 'Visits',
     visitsUnder: 'People who opened the site',
     taps: 'Taps',
-    tapsUnder: 'Phone, email, buttons and the form',
+    tapsUnder: 'Links and buttons people pressed',
     onSite: 'Time on the site',
     onSiteUnder: 'On average, per visit',
     plays: 'Plays',

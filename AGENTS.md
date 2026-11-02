@@ -174,7 +174,7 @@ Every word the panel itself shows sits in `src/panel/words.ts`. To put the panel
 
 By default the menu shows Content, Settings when a section has `page: 'settings'`, and Analytics.
 
-- `pages={['edit', 'settings']}` leaves out Analytics, for a site that counts nothing.
+- `pages={['edit', 'settings']}` leaves out Analytics, for a site that counts nothing. Settings still shows only when a section has `page: 'settings'`.
 - Add `'fields'` only when the site's design draws whatever boxes exist. On a fixed design, a box the owner adds there never shows on the site.
 
 ## 7. Build and copy

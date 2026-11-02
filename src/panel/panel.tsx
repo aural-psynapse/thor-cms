@@ -97,11 +97,11 @@ export function Panel({
   // section that belongs there, and never Fields: a box the owner adds there
   // shows on the site only when its design draws whatever boxes exist.
   const shown = useMemo(() => {
-    const wanted =
-      pages ??
-      ALL_PAGES.filter(
-        (p) => p !== 'fields' && (p !== 'settings' || fields.some((s) => s.page === 'settings')),
-      )
+    // Settings never shows empty, even when the site names it.
+    const hasSettings = fields.some((s) => s.page === 'settings')
+    const wanted = (pages ?? ALL_PAGES.filter((p) => p !== 'fields')).filter(
+      (p) => p !== 'settings' || hasSettings,
+    )
     const kept = PAGES.filter((p) => wanted.includes(p.page))
     return kept.length > 0 ? kept : PAGES.slice(0, 1)
   }, [pages, fields])
