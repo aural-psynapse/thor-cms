@@ -105,7 +105,9 @@ export function PreviewPane({ url, update, push, full, onFull, className }: Prev
       </span>
 
       {/* The outer box takes the shrunk size so nothing is clipped; the inner
-          one stays a true screen and is scaled down into it. */}
+          one stays a true screen and is zoomed down into it. Zoom, because
+          Chrome draws only part of a scaled-down frame when the window is
+          short, and leaves the rest white. */}
       <div
         style={{ width: screen.width * fit, height: screen.height * fit }}
         className='bg-background shrink-0 overflow-hidden rounded-xl border shadow-sm'
@@ -115,8 +117,7 @@ export function PreviewPane({ url, update, push, full, onFull, className }: Prev
           style={{
             width: screen.width,
             height: screen.height,
-            transform: `scale(${fit})`,
-            transformOrigin: 'top left',
+            zoom: fit,
           }}
         >
           <iframe

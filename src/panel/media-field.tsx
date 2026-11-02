@@ -159,7 +159,7 @@ export function MediaField({
         />
       ) : (
         <>
-          <Thumb url={url} icon={ImageIcon} />
+          <Thumb url={url} icon={ImageIcon} whole={rule.shape.kind === 'any'} />
 
           <span className='min-w-0 flex-1'>
             <span className='block truncate text-sm font-medium'>{label}</span>

@@ -26,13 +26,14 @@ function lastPush(push: ReturnType<typeof recordingSlots>['preview']['push']): P
 }
 
 describe('the preview beside the boxes', () => {
-  it('frames the address the preview code gives, scaled as one piece', async () => {
+  it('frames the address the preview code gives, zoomed as one piece', async () => {
     const { slots } = recordingSlots()
     await mountPanel(slots)
     const frame = screen.getByTitle('Your site') as HTMLIFrameElement
     expect(frame.getAttribute('src')).toBe('about:blank')
     const inner = document.querySelector('[data-screen]') as HTMLElement
-    expect(inner.style.transform).toMatch(/^scale\([\d.]+\)$/)
+    expect(inner.style.transform).toBe('')
+    expect(inner.style.getPropertyValue('zoom')).toMatch(/^[\d.]+$/)
   })
 
   it('pushes the unsaved words and the box being edited on every change', async () => {

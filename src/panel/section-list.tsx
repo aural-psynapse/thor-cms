@@ -21,6 +21,9 @@ export type SectionListProps = {
  * the whole card opens it.
  */
 export function SectionList({ sections, onChange, onOpen }: SectionListProps) {
+  // When every section is fixed, a label on each row says nothing.
+  const allFixed = sections.every((s) => s.fixed)
+
   function toggle(id: string, hidden: boolean) {
     onChange(sections.map((s) => (s.id === id ? { ...s, hidden } : s)))
   }
@@ -62,7 +65,7 @@ export function SectionList({ sections, onChange, onOpen }: SectionListProps) {
 
           {section.fixed ? (
             // The top bar and the footer stay where they are and stay on.
-            <span className='text-muted-foreground text-xs'>{WORDS.sections.alwaysOn}</span>
+            !allFixed && <span className='text-muted-foreground text-xs'>{WORDS.sections.alwaysOn}</span>
           ) : (
             <Tooltip>
               {/* the switch keeps its own look; the span is only there to be hovered over */}

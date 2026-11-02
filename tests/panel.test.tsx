@@ -35,6 +35,20 @@ describe('the panel drawn from a field list', () => {
     expect(numbers.load).not.toHaveBeenCalled()
   })
 
+  it('holds every section in place with one switch, with no label on each row', async () => {
+    const { slots } = recordingSlots()
+    render(<Panel fields={testFields} slots={slots} fixedSections />)
+    await screen.findByText('Hero')
+    expect(screen.queryAllByRole('switch')).toHaveLength(0)
+    expect(screen.queryByText('always on')).toBeNull()
+  })
+
+  it('labels the fixed rows when only some sections are fixed', async () => {
+    const { slots } = recordingSlots()
+    await mountPanel(slots)
+    expect(screen.getAllByText('always on').length).toBeGreaterThan(0)
+  })
+
   it('leaves Fields out of the menu unless the site asks for it', async () => {
     const { slots } = recordingSlots()
     await mountPanel(slots)

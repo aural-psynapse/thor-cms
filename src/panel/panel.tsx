@@ -55,6 +55,11 @@ export type PanelProps = {
    * "numbers".
    */
   pages?: Page[]
+  /**
+   * Every section stays where it is and stays on: no dragging, no switching
+   * off. For a site whose design holds its bands in one order.
+   */
+  fixedSections?: boolean
   liveCheck?: LiveCheck
 }
 
@@ -64,13 +69,18 @@ export type PanelProps = {
  * presses Save.
  */
 export function Panel({
-  fields,
+  fields: given,
   slots,
   title = WORDS.yourSite,
   siteUrl = '/',
   pages,
+  fixedSections = false,
   liveCheck,
 }: PanelProps) {
+  const fields = useMemo(
+    () => (fixedSections ? given.map((s) => ({ ...s, fixed: true })) : given),
+    [given, fixedSections],
+  )
   const [saved, setSaved] = useState<Content | null>(null)
   const [draft, setDraft] = useState<Content | null>(null)
   const [loadProblem, setLoadProblem] = useState<string | null>(null)

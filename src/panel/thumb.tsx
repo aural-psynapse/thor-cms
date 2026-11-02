@@ -7,13 +7,15 @@ export type ThumbProps = {
   url: string
   /** Drawn instead when there is no picture, or it will not load. */
   icon: LucideIcon
+  /** Shows the whole picture instead of filling the square, for a box that keeps any shape. */
+  whole?: boolean
 }
 
 /**
  * The little square on a picture box. Whenever there is nothing to show, or
  * the picture will not load, this draws a plain icon instead of a torn page.
  */
-export function Thumb({ url, icon: Icon }: ThumbProps) {
+export function Thumb({ url, icon: Icon, whole = false }: ThumbProps) {
   const [broken, setBroken] = useState(false)
 
   useEffect(() => {
@@ -36,7 +38,7 @@ export function Thumb({ url, icon: Icon }: ThumbProps) {
       <img
         src={url}
         alt=''
-        className='h-full w-full object-cover'
+        className={whole ? 'h-full w-full object-contain p-1.5' : 'h-full w-full object-cover'}
         onError={() => setBroken(true)}
       />
     </span>
