@@ -1,8 +1,9 @@
 // DEMO ONLY. Stands in for the site inside the preview frame: it draws the
-// content it is sent, plainly, and scrolls to the box being edited. A real
-// site draws its own pages instead; see AGENTS.md.
+// content it is sent, plainly, scrolls to the box being edited and frames its
+// words for a moment. A real site draws its own pages instead; see AGENTS.md.
 
 import { useEffect, useState } from 'react'
+import { frame, openAround } from './look-frame'
 import type { Content, JsonValue, StoredField } from '@/panel/field-list'
 import { readItems, readLinks, readPictures, readText } from '@/panel/lib/values'
 import type { PreviewUpdate } from '@/panel/slots'
@@ -111,14 +112,14 @@ export function PreviewPage() {
   useEffect(() => {
     if (!focus) return
     const where = focus.field ? `${focus.section}/${focus.field}` : focus.section
-    document
-      .querySelector(`[data-look="${CSS.escape(where)}"]`)
-      ?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+    const el = document.querySelector(`[data-look="${CSS.escape(where)}"]`)
+    if (!el) return
+    openAround(el)
+    el.scrollIntoView({ behavior: 'smooth', block: focus.field ? 'center' : 'start' })
+    if (focus.field) frame(el)
   }, [focus])
 
   if (!content) return <p className='p-6 text-sm'>Waiting for the panel…</p>
-
-  const looking = focus?.field ? `${focus.section}/${focus.field}` : focus?.section
 
   return (
     <main className='mx-auto max-w-3xl space-y-12 p-6'>
@@ -134,11 +135,7 @@ export function PreviewPage() {
             {section.fields.map((field) => {
               const where = `${section.id}/${field.key}`
               return (
-                <div
-                  key={field.key}
-                  data-look={where}
-                  className={looking === where ? 'rounded-lg ring-2 ring-emerald-500 ring-offset-4' : ''}
-                >
+                <div key={field.key} data-look={where}>
                   <Value field={field} value={content.values[section.id]?.[field.key]} />
                 </div>
               )
