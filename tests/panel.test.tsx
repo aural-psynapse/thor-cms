@@ -35,6 +35,14 @@ describe('the panel drawn from a field list', () => {
     expect(numbers.load).not.toHaveBeenCalled()
   })
 
+  it('leaves Fields out of the menu unless the site asks for it', async () => {
+    const { slots } = recordingSlots()
+    await mountPanel(slots)
+    expect(screen.getByRole('button', { name: 'Content' })).toBeTruthy()
+    expect(screen.getByRole('button', { name: 'Analytics' })).toBeTruthy()
+    expect(screen.queryByRole('button', { name: 'Fields' })).toBeNull()
+  })
+
   it('moves settings sections out of the edit list onto the Settings page', async () => {
     const { slots, content } = recordingSlots({
       sections: [],

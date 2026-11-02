@@ -67,7 +67,7 @@ describe('checking a field list', () => {
 
 async function openFields(start: Parameters<typeof recordingSlots>[0] = null) {
   const recorded = recordingSlots(start)
-  const user = await mountPanel(recorded.slots)
+  const user = await mountPanel(recorded.slots, testFields, ['edit', 'numbers', 'fields'])
   await user.click(screen.getByRole('button', { name: 'Fields' }))
   return { ...recorded, user }
 }

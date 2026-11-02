@@ -139,11 +139,42 @@ export function rendersOf(list: FieldList): Map<string, CustomRender> {
 }
 
 /**
- * The content the panel starts from. Saved content keeps the owner's own
- * field list; with nothing saved yet, the list in code is the start and every
- * box is empty.
+ * The content the panel starts from. With nothing saved yet, the list in code
+ * is the start and every box is empty.
+ *
+ * When the owner can edit the field list, the saved list is hers and wins,
+ * but where a section sits (page, fixed, locked) still comes from the code.
+ * When she cannot, the code list wins: only her order and the sections she
+ * switched off carry over from the save.
  */
-export function startingContent(list: FieldList, saved: Content | null): Content {
-  if (saved && saved.sections.length > 0) return saved
-  return { sections: toStored(list), values: saved?.values ?? {} }
+export function startingContent(list: FieldList, saved: Content | null, fieldsEditable: boolean): Content {
+  const values = saved?.values ?? {}
+  if (!saved || saved.sections.length === 0) return { sections: toStored(list), values }
+  if (fieldsEditable) {
+    const code = new Map(list.map((s) => [s.id, s]))
+    return {
+      sections: saved.sections.map((s) => {
+        const from = code.get(s.id)
+        return from ? { ...s, page: from.page, fixed: from.fixed, locked: from.locked } : s
+      }),
+      values,
+    }
+  }
+  return { sections: keepOrder(toStored(list), saved.sections), values }
+}
+
+// The code's sections in the owner's saved order, with her switches. A
+// section new in code goes in right after the one before it in code.
+function keepOrder(code: StoredSection[], saved: StoredSection[]): StoredSection[] {
+  const was = new Map(saved.map((s, i) => [s.id, { s, i }]))
+  const out = code
+    .filter((s) => was.has(s.id))
+    .sort((a, b) => was.get(a.id)!.i - was.get(b.id)!.i)
+    .map((s): StoredSection => ({ ...s, hidden: s.fixed ? undefined : was.get(s.id)!.s.hidden }))
+  code.forEach((s, i) => {
+    if (was.has(s.id)) return
+    const before = i === 0 ? -1 : out.findIndex((o) => o.id === code[i - 1].id)
+    out.splice(before + 1, 0, s)
+  })
+  return out
 }

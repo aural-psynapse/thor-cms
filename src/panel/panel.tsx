@@ -49,9 +49,10 @@ export type PanelProps = {
   /** Where the menu's "Back to the site" button goes. */
   siteUrl?: string
   /**
-   * The pages the owner gets, in menu order. All three by default. A site
-   * whose design never changes leaves out "fields"; one that counts nothing
-   * leaves out "numbers".
+   * The pages the owner gets, in menu order. By default Content, Settings
+   * when a section belongs there, and Analytics. A site whose design draws
+   * whatever boxes exist adds "fields"; one that counts nothing leaves out
+   * "numbers".
    */
   pages?: Page[]
   liveCheck?: LiveCheck
@@ -81,14 +82,18 @@ export function Panel({
   // A site can leave pages out of the menu. A page left out is never open,
   // whatever was picked before.
   // Left to itself, the panel shows Settings only when the field list has a
-  // section that belongs there.
+  // section that belongs there, and never Fields: a box the owner adds there
+  // shows on the site only when its design draws whatever boxes exist.
   const shown = useMemo(() => {
     const wanted =
       pages ??
-      ALL_PAGES.filter((p) => p !== 'settings' || fields.some((s) => s.page === 'settings'))
+      ALL_PAGES.filter(
+        (p) => p !== 'fields' && (p !== 'settings' || fields.some((s) => s.page === 'settings')),
+      )
     const kept = PAGES.filter((p) => wanted.includes(p.page))
     return kept.length > 0 ? kept : PAGES.slice(0, 1)
   }, [pages, fields])
+  const fieldsEditable = shown.some((p) => p.page === 'fields')
   const [picked, setPage] = useState<Page>(shown[0]?.page ?? 'edit')
   const page = shown.some((p) => p.page === picked) ? picked : (shown[0]?.page ?? 'edit')
   const [days, setDays] = useState(30)
@@ -106,7 +111,7 @@ export function Panel({
       .load()
       .then((loaded) => {
         if (gone) return
-        const start = startingContent(fields, loaded)
+        const start = startingContent(fields, loaded, fieldsEditable)
         setSaved(start)
         setDraft(start)
       })
@@ -116,7 +121,7 @@ export function Panel({
     return () => {
       gone = true
     }
-  }, [fields, slots.content])
+  }, [fields, slots.content, fieldsEditable])
 
   // The numbers are read when the page opens, when she picks another period,
   // and when she presses Check again.
