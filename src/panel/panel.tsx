@@ -5,6 +5,7 @@ import { TooltipProvider } from '@/components/ui/tooltip'
 import { cn } from '@/lib/utils'
 import type { NumbersState } from './analytics-board'
 import {
+  forScreen,
   rendersOf,
   startingContent,
   type Content,
@@ -89,6 +90,7 @@ export function Panel({
   const [pending, setPending] = useState<Map<string, File>>(() => new Map())
   const [focus, setFocus] = useState<PreviewFocus | null>(null)
   const [fullPreview, setFullPreview] = useState(false)
+  const [onPhone, setOnPhone] = useState(true)
   // A site can leave pages out of the menu. A page left out is never open,
   // whatever was picked before.
   // Left to itself, the panel shows Settings only when the field list has a
@@ -165,7 +167,8 @@ export function Panel({
 
   const dirty = !sameContent(draft, saved)
   const busy = stage.name === 'sending' || stage.name === 'saving'
-  const section = draft.sections.find((s) => s.id === open) ?? null
+  const opened = draft.sections.find((s) => s.id === open)
+  const section = opened ? forScreen(opened, onPhone) : null
   // Bands of the page go in the Edit list; the rest sit on the Settings page.
   const bands = draft.sections.filter((s) => s.page !== 'settings')
   const settingsSections = draft.sections.filter((s) => s.page === 'settings')
@@ -351,9 +354,22 @@ export function Panel({
                   />
                 ) : (
                   <SectionList
-                    sections={bands}
+                    sections={bands.map((s) => forScreen(s, onPhone))}
                     // The settings sections keep their places after the bands.
-                    onChange={(next) => change({ ...draft, sections: [...next, ...settingsSections] })}
+                    // Names go back to the ones in the list, whichever screen
+                    // the preview shows.
+                    onChange={(next) =>
+                      change({
+                        ...draft,
+                        sections: [
+                          ...next.map((s) => {
+                            const was = bands.find((b) => b.id === s.id)
+                            return was ? { ...s, label: was.label, fields: was.fields } : s
+                          }),
+                          ...settingsSections,
+                        ],
+                      })
+                    }
                     onOpen={openSection}
                   />
                 )}
@@ -366,6 +382,8 @@ export function Panel({
                   push={slots.preview.push}
                   full={fullPreview}
                   onFull={setFullPreview}
+                  onPhone={onPhone}
+                  setOnPhone={setOnPhone}
                   className='hidden min-h-0 flex-1 lg:grid'
                 />
               )}

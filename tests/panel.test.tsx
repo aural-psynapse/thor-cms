@@ -49,6 +49,33 @@ describe('the panel drawn from a field list', () => {
     expect(screen.getAllByText('always on').length).toBeGreaterThan(0)
   })
 
+  it('names sections and boxes the way the screen in the preview shows them', async () => {
+    const { slots } = recordingSlots()
+    const user = await mountPanel(slots, [
+      {
+        id: 'hero',
+        label: 'Hero',
+        fields: [{ key: 'title', label: 'Heading', type: 'text' }],
+      },
+      {
+        id: 'top',
+        label: 'Top bar',
+        phoneLabel: 'Phone menu',
+        fields: [
+          { key: 'cta', label: 'Button', phoneLabel: 'Button at the bottom', type: 'text' },
+          { key: 'tagline', label: 'Tagline', screen: 'laptop', type: 'text' },
+        ],
+      },
+    ])
+    expect(screen.getByText('Phone menu')).toBeTruthy()
+    await user.click(screen.getByText('Phone menu'))
+    expect(screen.getByText('Button at the bottom')).toBeTruthy()
+    expect(screen.queryByText('Tagline')).toBeNull()
+    await user.click(screen.getByRole('button', { name: 'Show it laptop size' }))
+    expect(screen.getByText('Button')).toBeTruthy()
+    expect(screen.getByText('Tagline')).toBeTruthy()
+  })
+
   it('leaves Fields out of the menu unless the site asks for it', async () => {
     const { slots } = recordingSlots()
     await mountPanel(slots)

@@ -32,6 +32,9 @@ export type PreviewPaneProps = {
   /** Filling the whole screen. Escape leaves. */
   full: boolean
   onFull: (full: boolean) => void
+  /** Showing the phone; the laptop otherwise. The boxes beside follow it. */
+  onPhone: boolean
+  setOnPhone: (onPhone: boolean) => void
   className?: string
 }
 
@@ -40,12 +43,11 @@ export type PreviewPaneProps = {
  * page, drawn inside a window on this one, so what the owner sees here is
  * what visitors get. Nothing is saved by looking.
  */
-export function PreviewPane({ url, update, push, full, onFull, className }: PreviewPaneProps) {
+export function PreviewPane({ url, update, push, full, onFull, onPhone, setOnPhone, className }: PreviewPaneProps) {
   const frame = useRef<HTMLIFrameElement>(null)
   const box = useRef<HTMLDivElement>(null)
   const latest = useRef(update)
   const [room, setRoom] = useState({ width: 0, height: 0 })
-  const [onPhone, setOnPhone] = useState(true)
   latest.current = update
 
   function send() {

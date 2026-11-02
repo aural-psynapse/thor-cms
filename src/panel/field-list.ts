@@ -22,6 +22,10 @@ export type FieldBase = {
   key: string
   /** What the owner reads above the box. */
   label: string
+  /** What she reads instead while the preview shows the phone, where the box sits elsewhere. */
+  phoneLabel?: string
+  /** Shown on one screen only: the box is listed only while the preview shows that screen. */
+  screen?: 'phone' | 'laptop'
 }
 
 /** One line of words, or a bigger box for paragraphs. */
@@ -84,6 +88,8 @@ export type Section<F = Field> = {
   /** Unique in the list. The content keeps this section's values under it. */
   id: string
   label: string
+  /** The name while the preview shows the phone, where the band looks different. */
+  phoneLabel?: string
   /** Held in place: no dragging, no switching off. The top bar, the footer. */
   fixed?: boolean
   /** Nothing inside to change, so it does not open. */
@@ -122,9 +128,22 @@ export function toStored(list: FieldList): StoredSection[] {
     ...section,
     fields: section.fields.map((field): StoredField => {
       if (field.type !== 'custom') return field
-      return { type: 'custom', key: field.key, label: field.label }
+      const { render: _render, ...rest } = field
+      return rest
     }),
   }))
+}
+
+/** A section named the way the screen in the preview shows it, with only the boxes that screen shows. */
+export function forScreen<F extends FieldBase>(section: Section<F>, onPhone: boolean): Section<F> {
+  const screen = onPhone ? 'phone' : 'laptop'
+  const fields = section.fields.filter((field) => !field.screen || field.screen === screen)
+  if (!onPhone) return { ...section, fields }
+  return {
+    ...section,
+    label: section.phoneLabel ?? section.label,
+    fields: fields.map((field) => ({ ...field, label: field.phoneLabel ?? field.label })),
+  }
 }
 
 /** Every custom render in the code list, found by its key. */
@@ -143,7 +162,8 @@ export function rendersOf(list: FieldList): Map<string, CustomRender> {
  * is the start and every box is empty.
  *
  * When the owner can edit the field list, the saved list is hers and wins,
- * but where a section sits (page, fixed, locked) still comes from the code.
+ * but where a section sits (page, fixed, locked) and its phone names still
+ * come from the code.
  * When she cannot, the code list wins: only her order and the sections she
  * switched off carry over from the save.
  */
@@ -155,7 +175,19 @@ export function startingContent(list: FieldList, saved: Content | null, fieldsEd
     return {
       sections: saved.sections.map((s) => {
         const from = code.get(s.id)
-        return from ? { ...s, page: from.page, fixed: from.fixed, locked: from.locked } : s
+        if (!from) return s
+        const boxes = new Map(from.fields.map((f) => [f.key, f]))
+        return {
+          ...s,
+          page: from.page,
+          fixed: from.fixed,
+          locked: from.locked,
+          phoneLabel: from.phoneLabel,
+          fields: s.fields.map((f) => {
+            const box = boxes.get(f.key)
+            return box ? { ...f, phoneLabel: box.phoneLabel, screen: box.screen } : f
+          }),
+        }
       }),
       values,
     }
