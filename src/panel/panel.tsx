@@ -1,6 +1,8 @@
 import { Suspense, lazy, useEffect, useMemo, useState } from 'react'
 import { Eye, LoaderCircle } from 'lucide-react'
+import { toast } from 'sonner'
 import { SidebarInset, SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar'
+import { Toaster } from '@/components/ui/sonner'
 import { TooltipProvider } from '@/components/ui/tooltip'
 import { cn } from '@/lib/utils'
 import type { NumbersState } from './analytics-board'
@@ -257,6 +259,8 @@ export function Panel({
             problem: WORDS.save.slow,
           },
     )
+    // The line in the save bar is easy to miss, so the corner says it too.
+    if (live) toast.success(WORDS.save.live)
   }
 
   function openSection(id: string) {
@@ -395,6 +399,7 @@ export function Panel({
           )}
         </SidebarInset>
       </SidebarProvider>
+      <Toaster position='bottom-right' richColors />
     </TooltipProvider>
   )
 }

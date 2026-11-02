@@ -175,7 +175,13 @@ describe('editing and saving', () => {
     await user.type(screen.getByLabelText('Intro'), 'A longer line')
     await user.click(screen.getByRole('button', { name: 'Save' }))
 
-    await screen.findByText('Your change is on the live site.')
+    // In the save bar, and in the pop-up in the corner.
+    await waitFor(() =>
+      expect(document.querySelector('[data-sonner-toast]')?.textContent).toContain(
+        'Your change is on the live site.',
+      ),
+    )
+    expect(screen.getAllByText('Your change is on the live site.').length).toBeGreaterThan(1)
     const sent = lastSaved(content)
     expect(sent.values.hero).toMatchObject({ title: 'Hello', intro: 'A longer line' })
     // the whole content goes, field list included
