@@ -207,6 +207,93 @@ export function AnalyticsBoard({ days, onDays, state, onRefresh, sections, links
   const visits = total(seen.visits)
   const byDay = joinDays(seen.visits, seen.plays)
   const watchedMost = seen.videos.filter((v) => v.plays > 0).slice(0, 3)
+  // A site with no video box gets no video numbers: visits, taps and time on the page instead.
+  const hasVideos = sections.some((s) => s.fields.some((f) => f.type === 'video'))
+
+  // What people pressed, where they stayed, where they came from: the same on every site.
+  const rest = (
+    <>
+      <div className='grid gap-4 md:grid-cols-2'>
+        <Listing
+          title={WORDS.numbers.pressed}
+          blurb={WORDS.numbers.pressedBlurb}
+          icon={MousePointerClick}
+          rows={seen.taps.map((tap) => {
+            const link = links.find((l) => l.id === tap.link)
+            return {
+              name: link?.platformName ?? tap.link,
+              brand: link && hasBrand(link.platform) ? link.platform : undefined,
+              icon: Link2,
+              under: link?.text || WORDS.numbers.times(tap.count),
+              value: String(tap.count),
+            }
+          })}
+        />
+        <Listing
+          title={WORDS.numbers.spend}
+          blurb={WORDS.numbers.spendBlurb}
+          icon={Timer}
+          rows={seen.stays.map((stay) => {
+            const section = sections.find((s) => s.id === stay.section)
+            return {
+              name: section?.label ?? stay.section,
+              icon: sectionMark(section),
+              under: WORDS.numbers.visitCount(stay.visits),
+              value: asTime(stay.seconds / Math.max(stay.visits, 1)),
+            }
+          })}
+        />
+      </div>
+
+      <div className='grid gap-4 md:grid-cols-2'>
+        <Listing
+          title={WORDS.numbers.from}
+          blurb={WORDS.numbers.fromBlurb}
+          icon={Globe}
+          rows={seen.sources.map((s) => ({ name: s.name, under: share(s.visits, visits), value: String(s.visits) }))}
+        />
+        <Listing
+          title={WORDS.numbers.country}
+          blurb={WORDS.numbers.countryBlurb}
+          icon={MapPin}
+          rows={seen.countries.map((c) => ({
+            name: countryName(c.code),
+            flag: flagOf(c.code),
+            under: share(c.visits, visits),
+            value: String(c.visits),
+          }))}
+        />
+      </div>
+    </>
+  )
+
+  if (!hasVideos) {
+    const taps = seen.taps.reduce((sum, tap) => sum + tap.count, 0)
+    const seconds = seen.stays.reduce((sum, stay) => sum + stay.seconds, 0)
+    return (
+      <div className='space-y-4'>
+        {header}
+
+        <div className='grid gap-4 sm:grid-cols-3'>
+          <Figure title={WORDS.numbers.visits} value={String(visits)} under={WORDS.numbers.visitsUnder} icon={Users} />
+          <Figure title={WORDS.numbers.taps} value={String(taps)} under={WORDS.numbers.tapsUnder} icon={MousePointerClick} />
+          <Figure title={WORDS.numbers.onSite} value={asTime(seconds / Math.max(visits, 1))} under={WORDS.numbers.onSiteUnder} icon={Timer} />
+        </div>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>{WORDS.numbers.visits}</CardTitle>
+            <CardDescription>{WORDS.numbers.inLast(visits, days)}</CardDescription>
+          </CardHeader>
+          <CardContent className='ps-2'>
+            <VisitsBars data={byDay} />
+          </CardContent>
+        </Card>
+
+        {rest}
+      </div>
+    )
+  }
 
   return (
     <div className='space-y-4'>
@@ -263,57 +350,7 @@ export function AnalyticsBoard({ days, onDays, state, onRefresh, sections, links
         </TabsContent>
       </Tabs>
 
-      <div className='grid gap-4 md:grid-cols-2'>
-        <Listing
-          title={WORDS.numbers.pressed}
-          blurb={WORDS.numbers.pressedBlurb}
-          icon={MousePointerClick}
-          rows={seen.taps.map((tap) => {
-            const link = links.find((l) => l.id === tap.link)
-            return {
-              name: link?.platformName ?? tap.link,
-              brand: link && hasBrand(link.platform) ? link.platform : undefined,
-              icon: Link2,
-              under: link?.text || WORDS.numbers.times(tap.count),
-              value: String(tap.count),
-            }
-          })}
-        />
-        <Listing
-          title={WORDS.numbers.spend}
-          blurb={WORDS.numbers.spendBlurb}
-          icon={Timer}
-          rows={seen.stays.map((stay) => {
-            const section = sections.find((s) => s.id === stay.section)
-            return {
-              name: section?.label ?? stay.section,
-              icon: sectionMark(section),
-              under: WORDS.numbers.visitCount(stay.visits),
-              value: asTime(stay.seconds / Math.max(stay.visits, 1)),
-            }
-          })}
-        />
-      </div>
-
-      <div className='grid gap-4 md:grid-cols-2'>
-        <Listing
-          title={WORDS.numbers.from}
-          blurb={WORDS.numbers.fromBlurb}
-          icon={Globe}
-          rows={seen.sources.map((s) => ({ name: s.name, under: share(s.visits, visits), value: String(s.visits) }))}
-        />
-        <Listing
-          title={WORDS.numbers.country}
-          blurb={WORDS.numbers.countryBlurb}
-          icon={MapPin}
-          rows={seen.countries.map((c) => ({
-            name: countryName(c.code),
-            flag: flagOf(c.code),
-            under: share(c.visits, visits),
-            value: String(c.visits),
-          }))}
-        />
-      </div>
+      {rest}
     </div>
   )
 }

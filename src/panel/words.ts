@@ -13,10 +13,10 @@ export const WORDS = {
 
   pages: {
     edit: {
-      name: 'Edit',
+      name: 'Content',
       blurb: 'Change the site one section at a time. Drag to reorder, switch off what you do not want.',
     },
-    numbers: { name: 'Numbers', blurb: 'How many people came to the site, and what they did there.' },
+    numbers: { name: 'Analytics', blurb: 'How many people came to the site, and what they did there.' },
     settings: {
       name: 'Settings',
       blurb: 'What sits outside the page itself: how search engines show the site, contact details, and the like.',
@@ -226,6 +226,10 @@ export const WORDS = {
     ofVisits: (percent: number) => `${percent}% of visits`,
     visits: 'Visits',
     visitsUnder: 'People who opened the site',
+    taps: 'Taps',
+    tapsUnder: 'Phone, email, buttons and the form',
+    onSite: 'Time on the site',
+    onSiteUnder: 'On average, per visit',
     plays: 'Plays',
     playsUnder: 'Times a video was started',
     watched: 'Time watched',

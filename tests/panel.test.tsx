@@ -29,8 +29,8 @@ describe('the panel drawn from a field list', () => {
   it('shows only the pages the site asks for', async () => {
     const { slots, numbers } = recordingSlots()
     await mountPanel(slots, testFields, ['edit'])
-    expect(screen.getByRole('button', { name: 'Edit' })).toBeTruthy()
-    expect(screen.queryByRole('button', { name: 'Numbers' })).toBeNull()
+    expect(screen.getByRole('button', { name: 'Content' })).toBeTruthy()
+    expect(screen.queryByRole('button', { name: 'Analytics' })).toBeNull()
     expect(screen.queryByRole('button', { name: 'Fields' })).toBeNull()
     expect(numbers.load).not.toHaveBeenCalled()
   })
@@ -70,7 +70,7 @@ describe('the panel drawn from a field list', () => {
     const { slots } = recordingSlots()
     render(<Panel fields={testFields} slots={slots} pages={['fields']} />)
     expect(await screen.findByRole('heading', { name: 'Fields' })).toBeTruthy()
-    expect(screen.queryByRole('button', { name: 'Edit' })).toBeNull()
+    expect(screen.queryByRole('button', { name: 'Content' })).toBeNull()
   })
 
   it('holds fixed sections in place, with no grip and no switch', async () => {

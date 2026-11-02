@@ -2,7 +2,7 @@ import { screen, waitFor, within } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
 import type { Content } from '@/panel/field-list'
 import { countryName, emptyNumbers, flagOf, joinDays, type Numbers } from '@/panel/lib/numbers'
-import { mountPanel, recordingSlots } from './helpers'
+import { mountPanel, recordingSlots, testFields } from './helpers'
 
 describe('joining visits and plays by day', () => {
   it('lays both over the same days, in order, with a zero where one is missing', () => {
@@ -75,9 +75,28 @@ async function openNumbers(numbers: Numbers = counted) {
   const recorded = recordingSlots(start)
   recorded.numbers.load.mockResolvedValue(numbers)
   const user = await mountPanel(recorded.slots)
-  await user.click(screen.getByRole('button', { name: 'Numbers' }))
+  await user.click(screen.getByRole('button', { name: 'Analytics' }))
   return { ...recorded, user }
 }
+
+describe('the Numbers page on a site with no video', () => {
+  it('shows visits, taps and time on the site, and nothing about videos', async () => {
+    const recorded = recordingSlots(start)
+    recorded.numbers.load.mockResolvedValue(counted)
+    const user = await mountPanel(
+      recorded.slots,
+      testFields.filter((s) => s.id !== 'film'),
+    )
+    await user.click(screen.getByRole('button', { name: 'Analytics' }))
+    await screen.findByText('42')
+    expect(screen.getByText('Taps')).toBeTruthy()
+    expect(screen.getByText('8')).toBeTruthy()
+    expect(screen.getByText('Time on the site')).toBeTruthy()
+    expect(screen.queryByText('Plays')).toBeNull()
+    expect(screen.queryByText('Most watched')).toBeNull()
+    expect(screen.queryByText('Visits against plays')).toBeNull()
+  })
+})
 
 describe('the Numbers page', () => {
   it('reads the last 30 days and draws what the numbers code returns', async () => {
@@ -133,7 +152,7 @@ describe('the Numbers page', () => {
     let fail: (e: Error) => void = () => {}
     recorded.numbers.load.mockImplementation(() => new Promise<Numbers>((_, no) => (fail = no)))
     const user = await mountPanel(recorded.slots)
-    await user.click(screen.getByRole('button', { name: 'Numbers' }))
+    await user.click(screen.getByRole('button', { name: 'Analytics' }))
     expect(document.querySelector('[aria-busy="true"]')).toBeTruthy()
     fail(new Error('offline'))
     await screen.findByText(/The numbers could not be read: .*offline/)

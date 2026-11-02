@@ -92,7 +92,7 @@ describe('the Fields page', () => {
     await user.selectOptions(within(hero).getByLabelText('Kind of new box in Hero'), 'longText')
     await user.click(within(hero).getByRole('button', { name: /Add box/ }))
 
-    await user.click(screen.getByRole('button', { name: 'Edit' }))
+    await user.click(screen.getByRole('button', { name: 'Content' }))
     await user.click(screen.getByText('Hero'))
     await user.type(screen.getByLabelText('Opening hours'), 'Nine to five')
 
@@ -119,7 +119,7 @@ describe('the Fields page', () => {
     await user.clear(title)
     await user.type(title, 'Big words')
     await user.selectOptions(within(hero).getByLabelText('Kind of box for Big words'), 'longText')
-    await user.click(screen.getByRole('button', { name: 'Edit' }))
+    await user.click(screen.getByRole('button', { name: 'Content' }))
     await user.click(screen.getByText('Hero'))
     expect(screen.getByLabelText('Big words').tagName).toBe('TEXTAREA')
   })
