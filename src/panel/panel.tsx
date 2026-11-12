@@ -1,6 +1,7 @@
-import { Suspense, lazy, useEffect, useMemo, useState } from 'react'
+import { Suspense, lazy, useEffect, useMemo, useState, type ReactNode } from 'react'
 import { Eye, LoaderCircle } from 'lucide-react'
 import { toast } from 'sonner'
+import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from '@/components/ui/sheet'
 import { SidebarInset, SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar'
 import { Toaster } from '@/components/ui/sonner'
 import { TooltipProvider } from '@/components/ui/tooltip'
@@ -66,7 +67,16 @@ export type PanelProps = {
    */
   fixedSections?: boolean
   liveCheck?: LiveCheck
+  /**
+   * The site's own how-to pages. Given, the menu shows Docs, which opens them
+   * in a sheet over the panel. A link inside calls `go` to close the sheet and
+   * open a page, or one section on the Content page.
+   */
+  docs?: (go: DocsGo) => ReactNode
 }
+
+/** Where a link in the docs takes the owner. */
+export type DocsGo = (to: { page: Page; section?: string }) => void
 
 /**
  * The admin panel. It loads the content once, keeps the owner's changes in a
@@ -81,7 +91,9 @@ export function Panel({
   pages,
   fixedSections = false,
   liveCheck,
+  docs,
 }: PanelProps) {
+  const [docsOpen, setDocsOpen] = useState(false)
   const fields = useMemo(
     () => (fixedSections ? given.map((s) => ({ ...s, fixed: true })) : given),
     [given, fixedSections],
@@ -302,7 +314,35 @@ export function Panel({
   return (
     <TooltipProvider>
       <SidebarProvider>
-        <PanelMenu title={title} pages={shown} page={page} onPage={setPage} siteUrl={siteUrl} />
+        <PanelMenu
+          title={title}
+          pages={shown}
+          page={page}
+          onPage={setPage}
+          siteUrl={siteUrl}
+          onDocs={docs ? () => setDocsOpen(true) : undefined}
+        />
+
+        {docs && (
+          <Sheet open={docsOpen} onOpenChange={setDocsOpen}>
+            <SheetContent side='right' className='w-full gap-0 sm:max-w-[min(1180px,94vw)]'>
+              <SheetHeader className='h-14 flex-row items-center gap-3 border-b px-5 py-0'>
+                <SheetTitle className='text-base'>{WORDS.menu.docs}</SheetTitle>
+                <SheetDescription className='hidden sm:block'>{WORDS.menu.docsBlurb}</SheetDescription>
+              </SheetHeader>
+              <div className='min-h-0 flex-1'>
+                {docs(({ page: to, section: id }) => {
+                  setDocsOpen(false)
+                  setPage(to)
+                  if (to === 'edit') {
+                    if (id) openSection(id)
+                    else setOpen(null)
+                  }
+                })}
+              </div>
+            </SheetContent>
+          </Sheet>
+        )}
 
         {/* Every page fills the screen: its columns scroll inside themselves,
             and the save bar sits under them at the bottom. */}

@@ -71,6 +71,8 @@ export const WORDS = {
     dark: 'Dark',
     system: 'Same as my computer',
     backToSite: 'Back to the site',
+    docs: 'Docs',
+    docsBlurb: 'How to use the admin panel, step by step.',
     menuTitle: 'Menu',
     menuBlurb: 'The pages of the admin panel.',
     toggle: 'Narrow or widen the menu',

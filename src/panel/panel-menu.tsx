@@ -1,5 +1,5 @@
 import { useEffect, useState, type ElementType } from 'react'
-import { BarChart3, Check, ExternalLink, Layers, ListTree, Monitor, Moon, Send, Settings, Sun } from 'lucide-react'
+import { BarChart3, BookOpen, Check, ExternalLink, Layers, ListTree, Monitor, Moon, Send, Settings, Sun } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
   DropdownMenu,
@@ -93,13 +93,15 @@ export type PanelMenuProps = {
   onPage: (page: Page) => void
   /** Where "Back to the site" goes. */
   siteUrl: string
+  /** Opens the docs over the page. Left out, the menu shows no Docs. */
+  onDocs?: () => void
 }
 
 /**
  * The menu down the left side. On a laptop it narrows to a strip of icons; on
  * a phone it slides away and the button in the slim top bar brings it back.
  */
-export function PanelMenu({ title, pages, page, onPage, siteUrl }: PanelMenuProps) {
+export function PanelMenu({ title, pages, page, onPage, siteUrl, onDocs }: PanelMenuProps) {
   const { open, state, setOpenMobile } = useSidebar()
   const [theme, setTheme] = useTheme()
   const current = CHOICES.find((c) => c.value === theme) ?? CHOICES[2]
@@ -164,6 +166,26 @@ export function PanelMenu({ title, pages, page, onPage, siteUrl }: PanelMenuProp
 
       <SidebarFooter>
         <div className='flex items-center gap-1 px-1 group-data-[collapsible=icon]:flex-col group-data-[collapsible=icon]:px-0'>
+          {onDocs && (
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant='ghost'
+                  size='icon'
+                  className='group-data-[collapsible=icon]:size-8'
+                  aria-label={WORDS.menu.docs}
+                  onClick={() => {
+                    onDocs()
+                    setOpenMobile(false)
+                  }}
+                >
+                  <BookOpen />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent side={side}>{WORDS.menu.docs}</TooltipContent>
+            </Tooltip>
+          )}
+
           <DropdownMenu modal={false}>
             <Tooltip>
               <TooltipTrigger asChild>

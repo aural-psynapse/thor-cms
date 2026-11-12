@@ -1,5 +1,6 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
+import { DemoDocs } from '@/demo/docs'
 import { PreviewPage } from '@/demo/preview-page'
 import { fieldList } from '@/fields'
 import { Panel } from '@/panel/panel'
@@ -14,7 +15,7 @@ const root = document.getElementById('root')
 if (root) {
   createRoot(root).render(
     <StrictMode>
-      {showingPreview ? <PreviewPage /> : <Panel fields={fieldList} slots={slots} />}
+      {showingPreview ? <PreviewPage /> : <Panel fields={fieldList} slots={slots} docs={(go) => <DemoDocs go={go} />} />}
     </StrictMode>,
   )
 }
