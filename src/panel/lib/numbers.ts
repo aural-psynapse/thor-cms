@@ -3,6 +3,7 @@
 // site; the Numbers page only draws it.
 
 import { WORDS } from '../words'
+import type { ReferralVisits } from './referrals'
 
 /** One day's count. `date` is written 2026-09-18. */
 export type DayCount = { date: string; count: number }
@@ -47,6 +48,8 @@ export type Numbers = {
   countries: CountryCount[]
   taps: TapCount[]
   stays: StayCount[]
+  /** Each referral's visits in the period. Left out on a site without referrals. */
+  referrals?: ReferralVisits[]
 }
 
 /** Visits and plays on the same day, which is what the charts draw. */

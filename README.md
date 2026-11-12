@@ -40,7 +40,9 @@ export const fieldList: FieldList = [
 ]
 ```
 
-Box types: `text`, `longText`, `picture`, `pictures`, `video`, `items`, `links`, `custom`.
+Box types: `text`, `longText`, `picture`, `pictures`, `video`, `items`, `links`, `entries`, `custom`.
+
+A site that gives the panel a `referrals` slot also gets the Referrals page, where the owner makes an address for one buyer and sees that buyer's visits on the Analytics page.
 
 A site whose design draws whatever boxes exist can turn on the "Fields" page, where the owner adds, renames and removes boxes. It is off by default.
 

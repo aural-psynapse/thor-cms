@@ -36,6 +36,9 @@ export function makeField(key: string, label: string, type: FieldType): StoredFi
       return { key, label, type, rule: SQUARE }
     case 'video':
       return { key, label, type, rule: VIDEO }
+    // The Fields page never offers this type; a bare list holds one text box per entry.
+    case 'entries':
+      return { key, label, type, one: 'entry', titleKey: 'title', fields: [{ key: 'title', label: 'Title', type: 'text' }] }
     default:
       return { key, label, type }
   }

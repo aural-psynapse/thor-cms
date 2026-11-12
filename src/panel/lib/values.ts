@@ -21,6 +21,17 @@ export type Collection = { id: string; name: string }
 /** What a list-of-items box holds. */
 export type ItemsValue = { items: Item[]; collections: Collection[] }
 
+/** One entry in a list of entries: its id and the value of each of its boxes. */
+export type Entry = { id: string; values: Record<string, JsonValue> }
+
+/** The entries in a list-of-entries box, or none. */
+export function readEntries(value: JsonValue | undefined): Entry[] {
+  return records(value).map((e, at) => ({
+    id: str(e.id) || `entry-${at + 1}`,
+    values: isRecord(e.values) ? (e.values as Record<string, JsonValue>) : {},
+  }))
+}
+
 /** One link: the platform, the words the page shows, and where it goes. */
 export type Link = { id: string; platform: string; text: string; url: string }
 

@@ -73,8 +73,9 @@ Each section has:
 - `page: 'settings'` for what a visitor never sees on the page, like the search engine title and description. It moves to the Settings page. Contact details that show on the page stay boxes in the section where they sit.
 - `fields`: the boxes, each with `key`, `label` and `type`. A box may add `phoneLabel`, and `screen: 'phone'` or `screen: 'laptop'` when it shows on one screen only.
 
-Types: `text`, `longText`, `picture`, `pictures`, `video`, `items`, `links`, `custom`.
+Types: `text`, `longText`, `picture`, `pictures`, `video`, `items`, `links`, `entries`, `custom`.
 
+- `entries` is a list the owner adds to, removes from and reorders: producers, articles, captioned photos. It takes `fields` (the boxes every entry has, any type but `custom` and `video`), `titleKey` (the box that names an entry in the list), an optional `pictureKey`, and `one` (what one entry is called: "article"). Its value is `[{ id, values }]`. An entry may hold another `entries` box.
 - `picture`, `pictures` and `items` need a `rule`. Use `SQUARE`, `WIDE`, `PORTRAIT` or `UPRIGHT_OR_WIDE` from `src/panel/lib/picture-rules.ts`, or write one with `pictureRule(shape, smallest, drawnWide)`. Set `drawnWide` to how wide the site draws that picture on a laptop. A logo takes `pictureRule({ kind: 'any' }, smallest, drawnWide)`, and the panel then shows it whole.
 - `video` needs a `rule`. Use `VIDEO` from `src/panel/lib/video-check.ts`, or write your own `{ types, biggestMb, least }`.
 - `links` may list its own `platforms`. Without it the box offers Instagram, TikTok, YouTube, Facebook, X, LinkedIn, Pinterest, Threads and Website.
@@ -155,6 +156,24 @@ On `focus`, the page:
 `src/demo/look-frame.ts` does the outline for the demo page.
 
 If the site cannot draw unsaved content, point `url` at the live site and make `push` do nothing.
+
+### Referrals: `src/slots/referrals.ts` (optional)
+
+A referral is a site address made for one buyer, such as example.com/majestic. Give the panel a `referrals` slot and the Referrals page appears; leave it out and the page goes.
+
+```ts
+type ReferralsSlot = {
+  site: string          // the address every referral starts with
+  reserved: string[]    // paths the site already uses: 'admin', 'journal'
+  list: () => Promise<Referral[]>
+  add: (referral: NewReferral) => Promise<Referral>
+  remove: (id: string) => Promise<void>
+}
+```
+
+- The site answers each referral address with its home page and records the visit.
+- `Numbers.referrals` lists each referral's visits for the period: `{ referral, visits: [{ at, seconds, longest, taps, country }] }`. The Analytics page shows one line per referral and opens every visit in a dialog.
+- Keeping a named visitor across later visits needs their consent first. Ask the owner how long named visits are kept, and delete them after that.
 
 ## 5. Put it behind a login
 

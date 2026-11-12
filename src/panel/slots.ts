@@ -4,6 +4,7 @@
 
 import type { Content } from './field-list'
 import type { Numbers } from './lib/numbers'
+import type { NewReferral, Referral } from './lib/referrals'
 
 /** Loads and saves the whole content, and says when a save is on the live site. */
 export type ContentSlot = {
@@ -55,10 +56,25 @@ export type PreviewSlot = {
   push: (frame: Window, update: PreviewUpdate) => void
 }
 
-/** All four, as the panel takes them. */
+/**
+ * Makes, lists and removes referrals: site addresses made for one buyer each.
+ * A site without referrals leaves this out, and the Referrals page goes with it.
+ */
+export type ReferralsSlot = {
+  /** The site's own address, which every referral starts with. */
+  site: string
+  /** Addresses the site already uses, which no referral may take: "admin", "journal". */
+  reserved: string[]
+  list: () => Promise<Referral[]>
+  add: (referral: NewReferral) => Promise<Referral>
+  remove: (id: string) => Promise<void>
+}
+
+/** All four, as the panel takes them, and referrals when the site has them. */
 export type Slots = {
   content: ContentSlot
   files: FilesSlot
   numbers: NumbersSlot
   preview: PreviewSlot
+  referrals?: ReferralsSlot
 }
