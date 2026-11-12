@@ -60,7 +60,6 @@ const MARKS: Record<FieldType, LucideIcon> = {
   video: Clapperboard,
   items: List,
   links: Link2,
-  entries: List,
   custom: Layers,
 }
 

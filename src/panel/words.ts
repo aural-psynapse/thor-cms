@@ -168,17 +168,6 @@ export const WORDS = {
     addFolder: 'Add a folder',
   },
 
-  entries: {
-    add: (one: string) => `Add a ${one}`,
-    untitled: (one: string) => `New ${one}`,
-    open: (name: string) => `Open ${name}`,
-    back: (label: string) => `Back to ${label.toLowerCase()}`,
-    remove: (name: string) => `Remove ${name}`,
-    removeTitle: (name: string) => `Remove ${name}?`,
-    none: (one: string) => `No ${one} yet.`,
-    count: (n: number, one: string) => `${n} ${n === 1 ? one : `${one}s`}`,
-  },
-
   links: {
     where: (name: string) => `Where ${name} is`,
     remove: (name: string) => `Remove ${name}`,
@@ -198,7 +187,6 @@ export const WORDS = {
       video: 'Video',
       items: 'List of items',
       links: 'List of links',
-      entries: 'List of entries',
       custom: 'Custom',
     },
     sectionName: 'Section name',

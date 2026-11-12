@@ -3,8 +3,7 @@ import { Label } from '@/components/ui/label'
 import type { CustomRender, JsonValue, StoredField } from './field-list'
 import { ItemsBox } from './items-box'
 import { DEFAULT_PLATFORMS } from './lib/links'
-import { readEntries, readItems, readLinks, readPictures, readText } from './lib/values'
-import { EntriesBox } from './entries-box'
+import { readItems, readLinks, readPictures, readText } from './lib/values'
 import { LinkList } from './link-list'
 import { MediaField } from './media-field'
 import { PictureRow } from './picture-row'
@@ -112,16 +111,6 @@ export function FieldBox({ field, value, onChange, onLook, tools }: FieldBoxProp
           onChange={onChange}
           onLook={onLook}
           disabled={tools.disabled}
-        />
-      )
-    case 'entries':
-      return (
-        <EntriesBox
-          field={field}
-          entries={readEntries(value)}
-          onChange={(next) => onChange(next)}
-          onLook={onLook}
-          tools={tools}
         />
       )
     case 'custom': {

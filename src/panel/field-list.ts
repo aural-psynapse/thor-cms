@@ -67,29 +67,6 @@ export type CustomRender = (props: CustomFieldProps) => ReactNode
  */
 export type CustomField = FieldBase & { type: 'custom'; render?: CustomRender }
 
-/**
- * A list of entries the owner adds, removes and reorders: producers, journal
- * articles, captioned photos. Every entry has the same boxes, and opens on its
- * own to show them. An entry box may itself hold a list of entries.
- */
-export type EntriesField = FieldBase & {
-  type: 'entries'
-  /** The boxes every entry has. */
-  fields: EntryBoxField[]
-  /** The box whose words name an entry in the list. */
-  titleKey: string
-  /** The picture box shown small beside an entry in the list. */
-  pictureKey?: string
-  /** What one entry is called: "producer", "article", "photo". */
-  one: string
-}
-
-/**
- * A box inside an entry: any kind but a custom one or a video. Videos go up
- * on Save from the section's own boxes only.
- */
-export type EntryBoxField = Exclude<Field, CustomField | VideoField>
-
 /** Any one box. */
 export type Field =
   | TextField
@@ -98,7 +75,6 @@ export type Field =
   | VideoField
   | ItemsField
   | LinksField
-  | EntriesField
   | CustomField
 
 /** The kinds of box, by name. */
@@ -141,10 +117,7 @@ export type Content = {
   values: Record<string, Record<string, JsonValue>>
 }
 
-/**
- * The kinds of box in the order the Fields page offers them, with their names.
- * A list of entries is left out: its boxes are set in code.
- */
+/** The kinds of box in the order the Fields page offers them, with their names. */
 export const FIELD_TYPES: { type: FieldType; name: string }[] = (
   ['text', 'longText', 'picture', 'pictures', 'video', 'items', 'links', 'custom'] as const
 ).map((type) => ({ type, name: WORDS.fields.types[type] }))

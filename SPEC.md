@@ -57,9 +57,8 @@ One working admin panel in this repo, running on fake data. An agent copies it i
 43. As an agent building this repo, I want every exported type named and documented, so that hovering a name explains it.
 44. As an agent building this repo, I want tests on the pure helpers and on the pieces with real behaviour, so that a change that breaks dragging or refusing a file fails loudly.
 45. As an agent building this repo, I want no file to mention the site the code came from, so that nothing leaks.
-46. As a site owner, I want to add, remove and reorder whole entries, each with its own words, pictures and links, so that I publish a new article or producer without a developer.
-47. As a site owner, I want help guides behind a book button, so that I learn the panel without leaving it.
-48. As an agent wiring a site, I want no visible trace of this repo's name in the site, so that the site reads as the client's own.
+46. As a site owner, I want help guides behind a book button, so that I learn the panel without leaving it.
+47. As an agent wiring a site, I want no visible trace of this repo's name in the site, so that the site reads as the client's own.
 
 ## Implementation Decisions
 

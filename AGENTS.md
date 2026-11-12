@@ -19,7 +19,9 @@ Before you write a line, ask the owner and write the answers down:
 
 Right after the answers, list every step only the owner can take: accounts, a card for a paid-looking service, tokens, login settings. Give each its link. The owner does them while you build, so the end is not a wait.
 
-If the site needs something the panel lacks, build it here in thor-cms, never only in the site's copy, so every later site gets it. Work in a separate folder so other sessions in thor-cms are not moved onto your branch:
+If the site needs something the panel lacks, build it in the site's copy. Content boxes for one site's content (a list of articles, a menu of dishes) belong there too: the site's agent writes them, with a `custom` box when no type fits.
+
+Build it here in thor-cms only when the owner says every site needs it, such as the Docs button. Then work in a separate folder so other sessions in thor-cms are not moved onto your branch:
 
 ```bash
 git worktree add ../thor-cms-<site> -b feat/<thing>
@@ -87,9 +89,8 @@ Each section has:
 - `page: 'settings'` for what a visitor never sees on the page, like the search engine title and description. It moves to the Settings page. Contact details that show on the page stay boxes in the section where they sit.
 - `fields`: the boxes, each with `key`, `label` and `type`. A box may add `phoneLabel`, and `screen: 'phone'` or `screen: 'laptop'` when it shows on one screen only.
 
-Types: `text`, `longText`, `picture`, `pictures`, `video`, `items`, `links`, `entries`, `custom`.
+Types: `text`, `longText`, `picture`, `pictures`, `video`, `items`, `links`, `custom`.
 
-- `entries` is a list the owner adds to, removes from and reorders: producers, articles, captioned photos. It takes `fields` (the boxes every entry has, any type but `custom` and `video`), `titleKey` (the box that names an entry in the list), an optional `pictureKey`, and `one` (what one entry is called: "article"). Its value is `[{ id, values }]`. An entry may hold another `entries` box.
 - `picture`, `pictures` and `items` need a `rule`. Use `SQUARE`, `WIDE`, `PORTRAIT` or `UPRIGHT_OR_WIDE` from `src/panel/lib/picture-rules.ts`, or write one with `pictureRule(shape, smallest, drawnWide)`. Set `drawnWide` to how wide the site draws that picture on a laptop. A logo takes `pictureRule({ kind: 'any' }, smallest, drawnWide)`, and the panel then shows it whole.
 - `video` needs a `rule`. Use `VIDEO` from `src/panel/lib/video-check.ts`, or write your own `{ types, biggestMb, least }`.
 - `links` may list its own `platforms`. Without it the box offers Instagram, TikTok, YouTube, Facebook, X, LinkedIn, Pinterest, Threads and Website.
