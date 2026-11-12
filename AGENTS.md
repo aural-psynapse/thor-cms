@@ -14,7 +14,18 @@ Before you write a line, ask the owner and write the answers down:
 - How does the owner log in?
 - Which language should the panel speak?
 - Does the site's design draw whatever boxes exist, or a fixed set? Only the first needs the Fields page.
-- Which pages should the owner see: Content, Settings, Analytics, Fields?
+- Which pages should the owner see: Content, Settings, Analytics, Fields, Referrals?
+- Does the owner want help guides behind the Docs button?
+
+Right after the answers, list every step only the owner can take: accounts, a card for a paid-looking service, tokens, login settings. Give each its link. The owner does them while you build, so the end is not a wait.
+
+If the site needs something the panel lacks, build it here in thor-cms, never only in the site's copy, so every later site gets it. Work in a separate folder so other sessions in thor-cms are not moved onto your branch:
+
+```bash
+git worktree add ../thor-cms-<site> -b feat/<thing>
+```
+
+Commit there, merge to `main`, remove the folder, then copy the panel again. Tell the owner before you finish that thor-cms has new commits.
 
 ## 1. See it work first
 
@@ -35,6 +46,8 @@ rsync -a --exclude .git --exclude node_modules --exclude dist --exclude .scratch
 
 Keep it a separate app with its own `package.json`. Do not merge it into the site's own build.
 
+The site never names this repo. Set `name` in the copy's `package.json` to `<site>-admin-panel`, and write the site's own README for it. Nothing the site's visitors, owner or repo see says "Thor".
+
 Do not edit these, so later fixes can be copied over them:
 
 - `src/panel/` (the panel), except `src/panel/words.ts`
@@ -47,6 +60,7 @@ You edit only these:
 - `src/slots/content.ts`, `files.ts`, `numbers.ts`, `preview.ts`
 - `src/slots/index.ts`
 - `src/main.tsx`, for the `Panel` props
+- `src/docs.tsx`, the site's own help guides
 - `src/panel/words.ts`, to translate
 
 Delete `src/demo/` and its two lines in `src/main.tsx` once the site's own preview works.
@@ -144,7 +158,7 @@ Pictures arrive already cut and shrunk to webp, 2000 pixels on the long side at 
 
 - `url` is a page on the site that can draw unsaved content. The panel shows it in a frame beside the boxes.
 - `push(frame, { content, focus })` sends that page the content and the box being edited. Use `frame.postMessage` with the site's own address as the target.
-- The page must post `{ thorPreview: 'ready' }` to its parent once it listens. The panel then sends the latest content.
+- The page must post `{ panelPreview: 'ready' }` to its parent once it listens. The panel then sends the latest content.
 
 On `focus`, the page:
 
@@ -196,6 +210,14 @@ By default the menu shows Content, Settings when a section has `page: 'settings'
 - `pages={['edit', 'settings']}` leaves out Analytics, for a site that counts nothing. Settings still shows only when a section has `page: 'settings'`.
 - Add `'fields'` only when the site's design draws whatever boxes exist. On a fixed design, a box the owner adds there never shows on the site.
 
+## 6d. Write the help guides
+
+Pass `docs={(go) => <Docs go={go} />}` to `Panel` and a book button appears at the bottom left, before the theme button. It opens the guides in a sheet over the panel, laid out like Linear's docs. `src/demo/docs.tsx` is a short example.
+
+- Write `src/docs.tsx` with `DocsReader` from `src/panel/docs-reader.tsx`. Each guide has a group, a title, an icon, an intro and parts with screenshots.
+- Link to places in the panel with `DocLink`: it closes the sheet and opens that page or section.
+- Take the screenshots from the site's own panel, with the site's own content. One action per part.
+
 ## 7. Build and copy
 
 ```bash
@@ -209,7 +231,10 @@ To serve the panel somewhere other than `/admin`, change `base` in `vite.config.
 
 ## 8. A worked example
 
-`docs/wiring-cloudflare.md` wires one whole site: a static site on a Cloudflare Worker, a password at `/admin`, saves committed to GitHub, pictures in the repo, and the live check. The Virtusolar site was built that way.
+Two whole sites, both on a Cloudflare Worker:
+
+- `docs/wiring-cloudflare.md`: a static site, a password at `/admin`, saves committed to GitHub, pictures in the repo. A save shows after a rebuild. The Virtusolar site was built that way.
+- `docs/wiring-cloudflare-kv.md`: content in KV, pictures in R2, an emailed code at `/admin` through Cloudflare Access, visit counts and referrals. A save shows at once. The SWA site was built that way.
 
 ## 9. Before you hand it over
 
@@ -233,6 +258,7 @@ Steps only the owner can take. Number them in your report, each with the link to
 Before you call the site done, check three things with the owner:
 
 - Every form on the site sends somewhere.
+- The login page shows the client's name, not another project's. Cloudflare's team and organization names cover the whole account.
 - The client gets a fresh password, not the one used while building.
 - Nothing on the page is frozen that should follow the calendar.
 

@@ -49,7 +49,7 @@ export type PreviewUpdate = { content: Content; focus: PreviewFocus | null }
 /**
  * Shows the site beside the boxes. The panel frames `url` and calls `push`
  * on every change, when the frame loads, and whenever the page inside posts
- * `{ thorPreview: 'ready' }` to say it is listening.
+ * `{ panelPreview: 'ready' }` to say it is listening.
  */
 export type PreviewSlot = {
   url: string

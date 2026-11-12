@@ -5,7 +5,7 @@
 import type { PreviewSlot } from '@/panel/slots'
 
 /** The message the demo preview page listens for. */
-export const PREVIEW_MESSAGE = 'thor-preview-update'
+export const PREVIEW_MESSAGE = 'panel-preview-update'
 
 /**
  * Frames the demo preview page inside this app and posts each update to it.

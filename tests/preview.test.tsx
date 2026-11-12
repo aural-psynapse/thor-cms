@@ -63,7 +63,7 @@ describe('the preview beside the boxes', () => {
     const before = preview.push.mock.calls.length
     await act(async () => {
       window.dispatchEvent(
-        new MessageEvent('message', { data: { thorPreview: 'ready' }, source: frame.contentWindow }),
+        new MessageEvent('message', { data: { panelPreview: 'ready' }, source: frame.contentWindow }),
       )
     })
     expect(preview.push.mock.calls.length).toBe(before + 1)

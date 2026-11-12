@@ -72,7 +72,7 @@ export function PreviewPane({ url, update, push, full, onFull, onPhone, setOnPho
     function onMessage(event: MessageEvent) {
       const said: unknown = event.data
       if (event.source !== frame.current?.contentWindow) return
-      if (typeof said === 'object' && said !== null && 'thorPreview' in said) send()
+      if (typeof said === 'object' && said !== null && 'panelPreview' in said) send()
     }
     window.addEventListener('message', onMessage)
     return () => window.removeEventListener('message', onMessage)

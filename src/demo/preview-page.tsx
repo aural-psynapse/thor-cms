@@ -105,7 +105,7 @@ export function PreviewPage() {
     }
     window.addEventListener('message', onMessage)
     // tells the panel this page is listening, so it sends the latest at once
-    window.parent.postMessage({ thorPreview: 'ready' }, window.location.origin)
+    window.parent.postMessage({ panelPreview: 'ready' }, window.location.origin)
     return () => window.removeEventListener('message', onMessage)
   }, [])
 
