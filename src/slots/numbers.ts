@@ -5,7 +5,7 @@ import type { Numbers } from '@/panel/lib/numbers'
 import type { NumbersSlot } from '@/panel/slots'
 
 /** The ids the fake numbers talk about, so they match the demo site. */
-export type FakeNumbersIds = { sections: string[]; links: string[]; videos: string[]; referrals?: string[] }
+export type FakeNumbersIds = { sections: string[]; links: string[]; videos: string[] }
 
 // The same made-up numbers every time, so the page does not jump about.
 function wobble(n: number): number {
@@ -49,16 +49,6 @@ export function fakeNumbers(ids: FakeNumbersIds, today = new Date()): NumbersSlo
           section,
           seconds: days * (40 - i * 5),
           visits: days,
-        })),
-        referrals: (ids.referrals ?? []).map((referral, r) => ({
-          referral,
-          visits: Array.from({ length: Math.max(0, 3 - r) }, (_, v) => ({
-            at: new Date(today.getTime() - (v * 2 + r + 1) * 86_400_000 - 3_600_000 * (9 + v)).toISOString(),
-            seconds: Math.round(60 + wobble(v + r * 7) * 300),
-            longest: ids.sections[(v + r) % Math.max(ids.sections.length, 1)] ?? null,
-            taps: ids.links.slice(0, (v + r) % 3),
-            country: v % 2 === 0 ? 'GB' : 'IE',
-          })),
         })),
       }
     },

@@ -8,12 +8,6 @@ import { fakeContent } from './content'
 import { fakeFiles } from './files'
 import { fakeNumbers } from './numbers'
 import { fakePreview } from './preview'
-import { fakeReferrals } from './referrals'
-
-const SAMPLE_REFERRALS = [
-  { id: 'r1', name: 'Majestic', buyer: 'Sarah Lee', sentOn: '2026-11-02', path: 'majestic' },
-  { id: 'r2', name: 'The Wine Society', buyer: '', sentOn: '2026-11-06', path: 'the-wine-society' },
-]
 
 /** The slots the demo runs on: everything in memory, no keys, no network. */
 export const slots: Slots = {
@@ -27,8 +21,6 @@ export const slots: Slots = {
     videos: sampleContent.sections.flatMap((s) =>
       s.fields.filter((f) => f.type === 'video').map((f) => f.label),
     ),
-    referrals: SAMPLE_REFERRALS.map((r) => r.id),
   }),
   preview: fakePreview(`${import.meta.env.BASE_URL}?preview`),
-  referrals: fakeReferrals('https://example.com', SAMPLE_REFERRALS, ['admin', 'journal']),
 }

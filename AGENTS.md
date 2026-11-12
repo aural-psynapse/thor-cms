@@ -14,7 +14,7 @@ Before you write a line, ask the owner and write the answers down:
 - How does the owner log in?
 - Which language should the panel speak?
 - Does the site's design draw whatever boxes exist, or a fixed set? Only the first needs the Fields page.
-- Which pages should the owner see: Content, Settings, Analytics, Fields, Referrals?
+- Which pages should the owner see: Content, Settings, Analytics, Fields?
 - Does the owner want help guides behind the Docs button?
 
 Right after the answers, list every step only the owner can take: accounts, a card for a paid-looking service, tokens, login settings. Give each its link. The owner does them while you build, so the end is not a wait.
@@ -171,24 +171,6 @@ On `focus`, the page:
 
 If the site cannot draw unsaved content, point `url` at the live site and make `push` do nothing.
 
-### Referrals: `src/slots/referrals.ts` (optional)
-
-A referral is a site address made for one buyer, such as example.com/majestic. Give the panel a `referrals` slot and the Referrals page appears; leave it out and the page goes.
-
-```ts
-type ReferralsSlot = {
-  site: string          // the address every referral starts with
-  reserved: string[]    // paths the site already uses: 'admin', 'journal'
-  list: () => Promise<Referral[]>
-  add: (referral: NewReferral) => Promise<Referral>
-  remove: (id: string) => Promise<void>
-}
-```
-
-- The site answers each referral address with its home page and records the visit.
-- `Numbers.referrals` lists each referral's visits for the period: `{ referral, visits: [{ at, seconds, longest, taps, country }] }`. The Analytics page shows one line per referral and opens every visit in a dialog.
-- Keeping a named visitor across later visits needs their consent first. Ask the owner how long named visits are kept, and delete them after that.
-
 ## 5. Put it behind a login
 
 The panel has no login. The site must stop anyone else reaching `/admin` and the code your slots call. Use what the host offers, for example a login page in front of `/admin`, or a password your server checks. Keep every key and token on the server. Never put one in the slots' browser code.
@@ -234,7 +216,7 @@ To serve the panel somewhere other than `/admin`, change `base` in `vite.config.
 Two whole sites, both on a Cloudflare Worker:
 
 - `docs/wiring-cloudflare.md`: a static site, a password at `/admin`, saves committed to GitHub, pictures in the repo. A save shows after a rebuild. The Virtusolar site was built that way.
-- `docs/wiring-cloudflare-kv.md`: content in KV, pictures in R2, an emailed code at `/admin` through Cloudflare Access, visit counts and referrals. A save shows at once. The SWA site was built that way.
+- `docs/wiring-cloudflare-kv.md`: content in KV, pictures in R2, an emailed code at `/admin` through Cloudflare Access, and visit counts. A save shows at once. The SWA site was built that way.
 
 ## 9. Before you hand it over
 

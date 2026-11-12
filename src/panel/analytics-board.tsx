@@ -26,8 +26,6 @@ import type { FieldType, StoredSection } from './field-list'
 import { IconButton } from './icon-button'
 import type { NamedLink } from './lib/links'
 import { asTime, countryName, flagOf, joinDays, total, type Numbers } from './lib/numbers'
-import type { Referral } from './lib/referrals'
-import { ReferralVisitsCard } from './referral-visits'
 import { Thumb } from './thumb'
 import { WORDS } from './words'
 
@@ -50,8 +48,6 @@ export type AnalyticsBoardProps = {
   sections: StoredSection[]
   /** Every link on the site, for the names and marks of "what they pressed". */
   links: NamedLink[]
-  /** The site's referrals, for their names. Left out on a site without referrals. */
-  referrals?: Referral[]
 }
 
 // A section's mark comes from the kind of box it is mostly about, so the
@@ -146,7 +142,7 @@ function Listing({ title, blurb, icon, rows }: { title: string; blurb: string; i
  * people watched, pressed and where they came from. Every name and mark comes
  * from the field list and the links on the site.
  */
-export function AnalyticsBoard({ days, onDays, state, onRefresh, sections, links, referrals }: AnalyticsBoardProps) {
+export function AnalyticsBoard({ days, onDays, state, onRefresh, sections, links }: AnalyticsBoardProps) {
   const header = (
     <div className='flex items-center gap-2'>
       {PERIODS.map((period) => (
@@ -205,10 +201,6 @@ export function AnalyticsBoard({ days, onDays, state, onRefresh, sections, links
         <p className='text-muted-foreground max-w-prose text-sm'>
           {WORDS.numbers.off}
         </p>
-        {/* Referral visits are kept apart from the counts, so they show even before counting is on. */}
-        {referrals && (
-          <ReferralVisitsCard counted={seen.referrals ?? []} referrals={referrals} sections={sections} links={links} />
-        )}
       </div>
     )
   }
@@ -222,15 +214,6 @@ export function AnalyticsBoard({ days, onDays, state, onRefresh, sections, links
   // What people pressed, where they stayed, where they came from: the same on every site.
   const rest = (
     <>
-      {referrals && (
-        <ReferralVisitsCard
-          counted={seen.referrals ?? []}
-          referrals={referrals}
-          sections={sections}
-          links={links}
-        />
-      )}
-
       <div className='grid gap-4 md:grid-cols-2'>
         <Listing
           title={WORDS.numbers.pressed}

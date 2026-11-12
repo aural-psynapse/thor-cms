@@ -1,5 +1,5 @@
 import { useEffect, useState, type ElementType } from 'react'
-import { BarChart3, BookOpen, Check, ExternalLink, Layers, ListTree, Monitor, Moon, Send, Settings, Sun } from 'lucide-react'
+import { BarChart3, BookOpen, Check, ExternalLink, Layers, ListTree, Monitor, Moon, Settings, Sun } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
   DropdownMenu,
@@ -25,7 +25,7 @@ import { cn } from '@/lib/utils'
 import { WORDS } from './words'
 
 /** The panel's pages. */
-export type Page = 'edit' | 'settings' | 'numbers' | 'referrals' | 'fields'
+export type Page = 'edit' | 'settings' | 'numbers' | 'fields'
 
 /** One page in the left menu: its name, the line under its title, its icon. */
 export type PageInfo = { page: Page; name: string; blurb: string; icon: ElementType }
@@ -35,7 +35,6 @@ export const PAGES: PageInfo[] = [
   { page: 'edit', ...WORDS.pages.edit, icon: Layers },
   { page: 'settings', ...WORDS.pages.settings, icon: Settings },
   { page: 'numbers', ...WORDS.pages.numbers, icon: BarChart3 },
-  { page: 'referrals', ...WORDS.pages.referrals, icon: Send },
   { page: 'fields', ...WORDS.pages.fields, icon: ListTree },
 ]
 

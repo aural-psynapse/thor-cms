@@ -15,16 +15,14 @@ Reader: the agent putting the panel on a site that runs on a Cloudflare Worker a
 | `PUT /admin/api/content` | Writes the content to KV and raises the version by one. `isLive` compares versions. |
 | `POST /admin/api/upload` | Puts a picture or video in R2. The site serves it from `/media/<key>`. |
 | `GET /admin/api/numbers` | Reads visit counts from Workers Analytics Engine through Cloudflare's SQL API. |
-| `GET/PUT /admin/api/referrals` | Reads and saves the referral list in KV. |
 
-- A visit through a referral address (`/<path>`) records the visit and opens the home page.
-- Named referral visits sit in KV with a 12-month expiry. Anonymous counts go to Analytics Engine.
+- Visit counts go to Analytics Engine. Nothing in them names a person.
 
 ## The Worker's settings
 
 In `wrangler.jsonc`:
 
-- `kv_namespaces`: one binding for content, referrals and named visits.
+- `kv_namespaces`: one binding for the content and its version.
 - `r2_buckets`: one binding for uploads.
 - `analytics_engine_datasets`: one binding for visit counts.
 - `vars.ACCESS_TEAM_DOMAIN`: the Access team address, `<team>.cloudflareaccess.com`.

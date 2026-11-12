@@ -25,7 +25,6 @@ import { SaveBar, type SaveStage } from './save-bar'
 import { SectionEditor } from './section-editor'
 import { SectionList } from './section-list'
 import { SettingsPage } from './settings-page'
-import { ReferralsPage } from './referrals-page'
 import { IconButton } from './icon-button'
 import { PreviewPane } from './preview-pane'
 import { PAGES, PanelMenu, type Page } from './panel-menu'
@@ -35,7 +34,6 @@ export type { Page }
 const ALL_PAGES: Page[] = PAGES.map((p) => p.page)
 import { WORDS } from './words'
 import type { PreviewFocus, PreviewUpdate, Slots } from './slots'
-import type { Referral } from './lib/referrals'
 
 // The charts are most of the panel's weight, so they load only when the
 // Numbers page is opened.
@@ -115,22 +113,18 @@ export function Panel({
   const shown = useMemo(() => {
     // Settings never shows empty, even when the site names it.
     const hasSettings = fields.some((s) => s.page === 'settings')
-    // Referrals shows only when the site gave the panel referrals code.
-    const hasReferrals = slots.referrals !== undefined
     const wanted = (pages ?? ALL_PAGES.filter((p) => p !== 'fields')).filter(
-      (p) => (p !== 'settings' || hasSettings) && (p !== 'referrals' || hasReferrals),
+      (p) => p !== 'settings' || hasSettings,
     )
     const kept = PAGES.filter((p) => wanted.includes(p.page))
     return kept.length > 0 ? kept : PAGES.slice(0, 1)
-  }, [pages, fields, slots.referrals])
+  }, [pages, fields])
   const fieldsEditable = shown.some((p) => p.page === 'fields')
   const [picked, setPage] = useState<Page>(shown[0]?.page ?? 'edit')
   const page = shown.some((p) => p.page === picked) ? picked : (shown[0]?.page ?? 'edit')
   const [days, setDays] = useState(30)
   const [numbers, setNumbers] = useState<NumbersState>({ name: 'loading' })
   const [asked, setAsked] = useState(0)
-  // The referrals' names, for the Analytics page. Undefined on a site without referrals.
-  const [referralList, setReferralList] = useState<Referral[] | undefined>(undefined)
   const renders = useMemo(() => rendersOf(fields), [fields])
   const update = useMemo<PreviewUpdate | null>(
     () => (draft ? { content: draft, focus } : null),
@@ -161,15 +155,6 @@ export function Panel({
     if (page !== 'numbers') return
     let gone = false
     setNumbers({ name: 'loading' })
-    slots.referrals
-      ?.list()
-      .then((list) => {
-        if (!gone) setReferralList(list)
-      })
-      .catch(() => {
-        // Without the names, each referral line still shows with its visits.
-        if (!gone) setReferralList([])
-      })
     slots.numbers
       .load(days)
       .then((read) => {
@@ -181,7 +166,7 @@ export function Panel({
     return () => {
       gone = true
     }
-  }, [page, days, asked, slots.numbers, slots.referrals])
+  }, [page, days, asked, slots.numbers])
 
   if (loadProblem) {
     return <p className='text-destructive p-6 text-sm'>{loadProblem}</p>
@@ -377,15 +362,8 @@ export function Panel({
                     onRefresh={() => setAsked((n) => n + 1)}
                     sections={draft.sections}
                     links={allLinks(draft)}
-                    referrals={slots.referrals ? (referralList ?? []) : undefined}
                   />
                 </Suspense>
-              </div>
-            )}
-
-            {page === 'referrals' && slots.referrals && (
-              <div className='min-h-0 flex-1 overflow-y-auto pe-1 pb-6'>
-                <ReferralsPage slot={slots.referrals} />
               </div>
             )}
 
